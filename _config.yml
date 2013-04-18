@@ -2,10 +2,9 @@
 #      Main Configs       #
 # ----------------------- #
 
-<<<<<<< HEAD
 url: http://andrew222.github.io/blog
 title: Andrew's Blog
-subtitle: A Rubist Blog.
+subtitle: A Rubist's Blog.
 author: Andrew Yang
 simple_search: http://google.com/search
 description:
