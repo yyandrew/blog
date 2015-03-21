@@ -56,3 +56,11 @@ role :db,  %w{104.236.177.134}
 #     auth_methods: %w(publickey password)
 #     # password: 'please use keys'
 #   }
+namespace :deploy do
+  task :restart do
+    on roles(:app) do
+      execute "sudo monit stop #{fetch(:application)}_1"
+      execute "sudo monit start #{fetch(:application)}_1"
+    end
+  end
+end
