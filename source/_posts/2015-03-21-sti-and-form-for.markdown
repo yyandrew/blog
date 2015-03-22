@@ -41,7 +41,10 @@ views/users/_form.html.haml
 = form_for(@user) do |f|
   = f.text_field :name
 ```
-此时表单会将数据post到front_end_users_path。但是我们还没有定义front_end_users_path。`undefined method `front_end_users_path' for #<#<Class:0xc052150>:0xc050404>`
+此时表单会将数据post到front_end_users_path。但是我们还没有定义front_end_users_path。
+```ruby
+undefined method `front_end_users_path' for #<#<Class:0xc052150>:0xc050404>
+```
 在[form的文档](http://guides.rubyonrails.org/form_helpers.html)已经告诫我们STI的自动识别功能是不可靠的。
 解决的方法很简单。[#becomes](http://apidock.com/rails/ActiveRecord/Persistence/becomes)能够装将front_end_user转换成user
 ```ruby
