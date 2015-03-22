@@ -62,6 +62,7 @@ namespace :deploy do
       execute "sudo monit start #{fetch(:application)}_1"
     end
   end
+
   task :stop do
     on roles(:app) do
       execute "sudo monit stop #{fetch(:application)}_1"

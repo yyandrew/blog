@@ -6,3 +6,11 @@ comments: true
 categories: "Rails"
 ---
 **form_for and STI**
+---
+STI有什么会非常方便。但是有时也比如
+---
+`class User < ActiveRecord::Base
+end`
+---
+`class ForntEndUser < User
+end`

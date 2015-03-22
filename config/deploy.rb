@@ -44,7 +44,4 @@ namespace :deploy do
       # end
     end
   end
-
-  after :deploy, "deploy:stop"
-
 end
