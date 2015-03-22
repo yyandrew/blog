@@ -57,10 +57,14 @@ role :db,  %w{104.236.177.134}
 #     # password: 'please use keys'
 #   }
 namespace :deploy do
-  task :restart do
+  task :start do
+    on roles(:app) do
+      execute "sudo monit start #{fetch(:application)}_1"
+    end
+  end
+  task :stop do
     on roles(:app) do
       execute "sudo monit stop #{fetch(:application)}_1"
-      execute "sudo monit start #{fetch(:application)}_1"
     end
   end
 end
