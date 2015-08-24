@@ -44,4 +44,4 @@ categories: "Tools"
          export TERM=xterm-256color
        fi
 7. 效果图
-      ![powerline](images/powerline.png)
+      ![powerline](/images/powerline.png)
