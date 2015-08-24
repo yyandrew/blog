@@ -5,8 +5,7 @@ date: 2015-03-21 09:34
 comments: true
 categories: "Rails"
 ---
-**form_for and STI**
----
+
 Rails的form_for会根据你的object的class名称自动产生URL。
 
 user.rb

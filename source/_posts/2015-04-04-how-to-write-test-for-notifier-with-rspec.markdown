@@ -3,7 +3,7 @@ layout: post
 title: "使用rspec+factory_girl测试Rails邮件(ActionMailer)"
 date: 2015-04-04 11:38
 comments: true
-categories: 
+categories: "Rails"
 ---
 
 邮件测试其实只用对是不是可以发送，邮件标题，发件人，收件人，邮件的内容的关键部分编写测试用例就可以了。
