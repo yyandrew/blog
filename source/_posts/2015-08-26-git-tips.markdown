@@ -1,0 +1,23 @@
+---
+layout: post
+title: "Git日常命令"
+date: 2015-08-26 15:18
+comments: true
+categories: "Git"
+---
+
+1. 列出还没有被合并到master分支是的分支
+```bash
+git branch --no-merged master
+```
+2. .gitignore不起作用的解决方法
+```bash
+git rm . -r --cached
+git add .
+git commit -m "fixed untracked files"
+```
+3. 查看代码的历史
+```bash
+git log -L <start>,<end>:<file> #start, end是方法开始，结束行号
+git log -L :<regex>:<file> #regex为正则表达式
+```
