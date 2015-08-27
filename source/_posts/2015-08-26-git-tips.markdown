@@ -6,21 +6,15 @@ comments: true
 categories: "Git"
 ---
 * 列出还没有被合并到master分支是的分支
-```bash
-git branch --no-merged master
-```
+      git branch --no-merged master
 * .gitignore不起作用的解决方法
-```bash
-git rm . -r --cached
-git add .
-git commit -m "fixed untracked files"
-```
+      git rm . -r --cached
+      git add .
+      git commit -m "fixed untracked files"
 * 查看代码的历史
-```bash
-git log -L <start>,<end>:<file> #start, end是方法开始，结束行号
-git log -L :<regex>:<file> #regex为正则表达式
-```
+      git log -L <start>,<end>:<file> #start, end是方法开始，结束行号
+      git log -L :<regex>:<file> #regex为正则表达式
 * 删除远程分支
-```bash
-git push origin :branch_name1
-```
+      git push origin :branch_name1
+* 撤消一个已经push的commit(16bdac68de)
+      git revert 16bdac68de
