@@ -12,7 +12,7 @@ categories: "Tools"
 
 2. 继续在terminal运行
 
-   `sudo apt-get install python-pip git`
+   `pip install --user git+git://github.com/Lokaltog/powerline`
 
 3. 编辑~/.profile,将~/.local/bin添加到$PATH
 
