@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "force update master branch when old master branch messed up"
+title: "利用新分支替换旧master分支"
 date: 2015-09-17 12:37
 comments: true
 categories: "Git"
