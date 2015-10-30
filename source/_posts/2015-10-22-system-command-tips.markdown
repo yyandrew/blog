@@ -19,4 +19,4 @@ categories: "System"
 * 显示当前文件夹及其子文件夹大于20M并且小于30M的文件
       find / -type f -size +20M -size -30M -exec ls -lh {} \; | awk '{ print $9 ": " $5 }'
 * 显示所有被监听的端口及其程序
-      sudo netstat -tulpn
+      sudo netstat -tulpn # t指tcp协议, u指udp协议,l指指显示被监听,p指显示程序名称,n指以ip地址+端口显示地址而不是以字符显示
