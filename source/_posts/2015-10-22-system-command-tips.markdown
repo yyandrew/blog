@@ -35,3 +35,7 @@ sudo netstat -tulpn # t指tcp协议, u指udp协议,l指指显示被监听,p指�
 ssh-keygen -t rsa # 一路回车到底
 cat ~/.ssh/id_rsa.pub | ssh user@host "mkdir ~/.ssh; cat >> ~/.ssh/authorized_keys"
 ```
+* 随机生成32位密码
+```bash
+openssl rand -base64 32
+```
