@@ -39,3 +39,7 @@ cat ~/.ssh/id_rsa.pub | ssh user@host "mkdir ~/.ssh; cat >> ~/.ssh/authorized_ke
 ```bash
 openssl rand -base64 32
 ```
+* 生成100M的大文件
+```bash
+fallocate -l 100M test.img
+```
