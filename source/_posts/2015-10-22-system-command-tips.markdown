@@ -43,3 +43,11 @@ openssl rand -base64 32
 ```bash
 fallocate -l 100M test.img
 ```
+* iptables操作
+```bash
+sudo iptables -A INPUT -p tcp -m tcp --dport 80 -j ACCEPT # 添加一个开放80端口的规则
+sudo iptables -nL --line-numbers # 显示所有规则并带行号
+sudo iptables -D INPUT 5 # 删除行号第5行处的规则
+sudo iptables -I INPUT 5 -i lo -p tcp -m tcp --dport 80 -j ACCEPT # 将开放80端口的规则插入到第5行
+sudo /etc/init.d/iptables save # 使修改生效
+```
