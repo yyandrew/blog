@@ -46,8 +46,24 @@ fallocate -l 100M test.img
 * iptables操作
 ```bash
 sudo iptables -A INPUT -p tcp -m tcp --dport 80 -j ACCEPT # 添加一个开放80端口的规则
+sudo iptables -I INPUT -s x.x.x.x -j DROP # 阻止ip为x.x.x.x的所有访问
 sudo iptables -nL --line-numbers # 显示所有规则并带行号
-sudo iptables -D INPUT 5 # 删除行号第5行处的规则
+sudo iptables -D INPUT 5 # 删除INPUT链第5行处的规则
 sudo iptables -I INPUT 5 -i lo -p tcp -m tcp --dport 80 -j ACCEPT # 将开放80端口的规则插入到第5行
+sudo iptables -A INPUT -m mac --mac-source 00:0F:EA:91:04:08 -j DROP # 阻止MAC地址为00:0F:EA:91:04:08的所有访问
 sudo /etc/init.d/iptables save # 使修改生效
+sudo iptables-save > /root/rule.file # 将当前防火墙规则保存到/root/rule.file
+sudo iptables-restore < /root/rule.file # 使用/root/rule.file的规则
+```
+* mysql操作
+```bash
+$ mysql # 进入mysql控制台
+mysql> select * from mysql.user; # 显示所有用户
+mysql> create database your_db_name;
+mysql> grant usage on *.* to your_user@localhost identified by 'your_user_password'; # 创建新用户
+mysql> grant all privileges on your_db_name.* to your_user@localhost ; 设置database的所有者
+
+# 备份及恢复备份
+$ mysql database_name < db_back.sql # 导入一个sql备份文件
+$ mysql database_name > db_back.sql # 备份database_name数据库
 ```
