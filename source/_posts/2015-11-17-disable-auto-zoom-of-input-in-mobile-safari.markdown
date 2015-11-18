@@ -17,3 +17,15 @@ input, textarea {
   -webkit-tap-highlight-color: rgba(0,0,0,0);
 }
 ```
+3.bootstrap里modal控件的textarea输入动作造成的body的距离浏览器顶部位置变化问题
+```js
+window.listTop = 0;
+// 在弹出的时候记录body距离浏览器顶部的位置
+$(document).on("shown.bs.modal", ".m-vote-popup", function() {
+  window.listTop = $("body").scrollTop();
+});
+// 在关闭modal时恢复modal的位置
+$(document).on("hide.bs.modal", ".m-vote-popup", function() {
+  $("body").scrollTop(window.listTop);
+});
+```
