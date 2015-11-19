@@ -67,3 +67,11 @@ mysql> grant all privileges on your_db_name.* to your_user@localhost ; 设置dat
 $ mysql database_name < db_back.sql # 导入一个sql备份文件
 $ mysql database_name > db_back.sql # 备份database_name数据库
 ```
+* 上传id_rsa.pub之后ssh免密码登录失效的另类解决方法
+```bash
+$ chmod 600 ~/.ssh/authorized_keys
+$ chmod 600 ~/.ssh/id_rsa
+$ chmod 700 ~/.ssh/id_rsa.pub
+$ chmod 700 ~/.ssh
+```
+
