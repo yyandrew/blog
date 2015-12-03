@@ -60,6 +60,10 @@ sudo iptables-restore < /root/rule.file # 使用/root/rule.file的规则
 $ mysql # 进入mysql控制台
 mysql> select * from mysql.user; # 显示所有用户
 mysql> create database your_db_name;
+mysql> SET PASSWORD FOR 'user'@'source_ip' = PASSWORD('password'); # 允许user从source_ip远程登录mysql
+mysql> grant all privileges on db1.* to 'user'@'source_ip'; # 允许user从source_ip管理db1数据库
+mysql> revoke all privileges on db1.* from 'user'@'source_ip'; # 禁止user从source_ip管理db1数据库
+mysql> drop user 'user'@'source_ip'; # 删除user从source_ip管理db1数据库
 mysql> grant usage on *.* to your_user@localhost identified by 'your_user_password'; # 创建新用户
 mysql> grant all privileges on your_db_name.* to your_user@localhost ; 设置database的所有者
 
@@ -74,4 +78,7 @@ $ chmod 600 ~/.ssh/id_rsa
 $ chmod 700 ~/.ssh/id_rsa.pub
 $ chmod 700 ~/.ssh
 ```
-
+* 测试linux服务器的性能
+```bash
+$ wget -qO- bench.sh | bash
+```
