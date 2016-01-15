@@ -17,6 +17,8 @@ du -s -h .
 du -s -h file1
 # 显示当前文件夹下文件及文件夹大小
 du -s -h ./*
+# 计算~/test_dir目录下文件的数量
+find ~/test_dir -type f | wc -l
 ```
 * 删除所有空文件夹
 ```bash
