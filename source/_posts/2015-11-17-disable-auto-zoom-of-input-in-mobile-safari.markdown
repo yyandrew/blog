@@ -29,3 +29,9 @@ $(document).on("hide.bs.modal", ".m-vote-popup", function() {
   $("body").scrollTop(window.listTop);
 });
 ```
+4.在某些情况下click事件失效的处理方法
+```javascript
+$(document).on('click touchend', '.clean-icons', function(e) {
+  // 在这里添加你的click事件
+});
+```
