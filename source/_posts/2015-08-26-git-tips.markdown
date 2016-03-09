@@ -28,3 +28,8 @@ git push origin :branch_name1
 ```bash
 git revert 16bdac68de
 ```
+* 跳转到指定tag
+```bash
+git tag -l
+git checkout target_tag
+```
