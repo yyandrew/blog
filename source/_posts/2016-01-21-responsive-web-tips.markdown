@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "responsive web tips"
+title: "响应式网站笔记"
 date: 2016-01-21 11:04
 comments: true
 categories: "CSS"
@@ -10,5 +10,11 @@ categories: "CSS"
 .targetDiv {
   display: flex;
   align-items: center;
+}
+```
+2.去掉IE10+中input[type='text']的x按钮
+```css
+input[type="tex"]::-ms-clear {
+  display: none;
 }
 ```
