@@ -43,7 +43,7 @@ $ git push origin staging
 ```
 Everything up-to-date
 ```
-什么？没有代码被push。预感不好，要跪，赶紧`git log`，我的commit不见了:(，感觉天要塌下来了。
+什么？没有代码被push。预感不好，要跪，赶紧`git log`，我的commit不见了，感觉天要塌下来了:(
 赶紧救助google。终于找到一些[解决方法](http://stackoverflow.com/a/2693668)
 ```bash
 $ git reflog | grep 50554 # 50554是commit信息的关键字
@@ -51,5 +51,5 @@ def8c08 HEAD@{5}: commit: FEEDBACK #50554
 $ git reset --hard HEAD@{5}
 HEAD is now at def8c08 FEEDBACK #50554
 ```
-`git reflog`建功了:)我的代码也回来了。
+[git reflog](https://git-scm.com/docs/git-reflog)建功了:)我的代码也回来了。
 不得不说git真的非常的强大。只要不运行`git-gc`你的代码就会找回来。
