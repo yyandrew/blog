@@ -5,7 +5,7 @@ date: 2016-04-09 18:37:59 +0800
 comments: true
 categories: "Blog"
 ---
-今天看了看octpress的版本实在是太低了，用的jeklly的版本还是`0.1`，于是开始着手升级。按照[官方的文档](http://octopress.org/docs/updating/)升级还算是比较顺利。
+今天看了看octpress的版本实在是太低了，用的jeklly的版本还是`~> 0.12`，于是开始着手升级。按照[官方的文档](http://octopress.org/docs/updating/)升级还算是比较顺利。
 
 结果在用`rake generate`命令重新生成静态文件的时候报错了。错误信息如下：
 
