@@ -8,14 +8,16 @@ categories: "System"
 假设有个python程序`/home/exam-python.py`需要通过`python /home/exam-python.py`启动，我们可以通过如下方法利用[monit](https://github.com/arnaudsj/monit)监控它.
 
 1.在`/etc/monit.d/`创建一个`python-monit`配置文件供monit使用
-```bash
+
+``` bash
 check process exam-python with pidfile /var/run/exam-python-pid.pid
   start = "/bin/exam-python-script start"
   stop = "/bin/exam-python-script stop"
 ```
 
 2.创建`/bin/exam-python-script`用于启动/终止python程序
-```bash
+
+``` bash
 #!/bin/bash
 
 PIDFILE=/var/run/exam-python-pid.pid

@@ -6,7 +6,8 @@ comments: true
 categories: "Bash"
 ---
 在bash中判断nginx是不是已经安装
-```bash
+
+``` bash
 #!/bin/bash
 function package_exists() {
   return dpkg -l "$1" &> /dev/null
