@@ -34,10 +34,9 @@ single: true
 </div>
 {% unless page.sidebar == false %}
 <aside class="sidebar">
-<<<<<<< HEAD
-  {% include asides/about.html %}
-=======
->>>>>>> update
+  {% if false%}
+    {% include asides/about.html %}
+  {% endif %}
   {% if site.post_asides.size %}
     {% include_array post_asides %}
   {% else %}
