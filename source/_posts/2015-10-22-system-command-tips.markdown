@@ -45,6 +45,12 @@ openssl rand -base64 32
 ```bash
 fallocate -l 100M test.img
 ```
+* rsync备份系统
+
+``` bash
+rsync -azvP /etc/* username@remote_host:/backup/ #注意敏感文件的权限
+```
+
 * iptables操作
 ```bash
 sudo iptables -A INPUT -p tcp -m tcp --dport 80 -j ACCEPT # 添加一个开放80端口的规则
