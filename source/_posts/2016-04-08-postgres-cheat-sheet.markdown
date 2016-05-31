@@ -16,3 +16,10 @@ dbname=# ALTER TABLE tablename ADD COLUMN newcolumn integer; # [字段类型](ht
 dbname=# ALTER TABLE tablename DROP COLUMN oldcolumn; # 删除字段
 dbname=# ALTER TABLE tablename ALTER COLUMN last_updated_at SET DEFAULT now(); # 设置默认值
 ```
+
+### 重新启动postgres(Mac OSX系统，brew安装)
+
+``` sh
+launchctl unload ~/Library/LaunchAgents/homebrew.mxcl.postgresql.plist # 停止postgres服务
+launchctl load ~/Library/LaunchAgents/homebrew.mxcl.postgresql.plist # 启动postgres服务
+```
