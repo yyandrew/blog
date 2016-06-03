@@ -18,3 +18,58 @@ input[type="tex"]::-ms-clear {
   display: none;
 }
 ```
+3.控制input的placeholder的样式
+
+``` css
+::-webkit-input-placeholder {
+   color: red;
+}
+
+:-moz-placeholder { /* Firefox 18- */
+   color: red;
+}
+
+::-moz-placeholder {  /* Firefox 19+ */
+   color: red;
+}
+
+:-ms-input-placeholder {
+   color: red;
+}
+```
+
+4.将4个block等宽，间距相等一行排列
+  ![blocks](/images/four-blocks.png)
+
+``` html html
+<div class="item-blocks">
+  <div class="block">
+    <div class="block1">This is block1</div>
+  </div>
+  <div class="block">
+    <div class="block2">This is block2</div>
+  </div>
+  <div class="block">
+    <div class="block3">This is block3</div>
+  </div>
+  <div class="block">
+    <div class="block4">This is block4</div>
+  </div>
+</div>
+```
+
+``` scss scss
+.item-blocks {
+  margin: 0 -5px;
+  .block {
+    width: 25%;
+    float: left;
+    .block1, .block2, .block3, .block4 {
+      background-color: #F6F6F6;
+      height: 125px;
+      margin: 0 5px;
+    }
+  }
+}
+
+```
