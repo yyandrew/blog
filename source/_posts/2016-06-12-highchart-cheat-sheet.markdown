@@ -42,3 +42,50 @@ tooltip: {
     overflow: visible !important;
 }
 ```
+
+4.在tooltip和pointer之间划一条虚线
+
+``` javascript
+tooltip: {
+  useHTML: true,
+  borderRadius: 5,
+  formatter: function() {
+    return '<div class="tooltip-of-chart">' + this.y + '</div>' + this.x;
+  },
+  positioner: function(labelWidth, labelHeight, point) {
+    return {
+      x: point.plotX + barChart.plotLeft - 80,
+      y: point.plotY + barChart.plotTop - 182
+    };
+  },
+  borderColor: "#979797"
+}
+plotOptions: {
+  series: {
+    point: {
+      events: {
+        mouseOver: function() {
+          var xPosition, yPosition;
+          var barChart = this.chart
+          xPosition = this.plotX + barChart.plotLeft + 1;
+          yPosition = this.plotY + barChart.plotTop;
+          barChart.dotLine = barChart.renderer.path(['M', xPosition, yPosition - 4, 'L', xPosition, yPosition - 71]).attr({
+            "stroke-width": 3,
+            stroke: "#CCCCCC",
+            dashstyle: "ShortDash"
+          }).add();
+          return barChart.dotLine.show();
+        }
+      }
+    },
+    events: {
+      mouseOut: function() {
+        var barChart = this.chart
+        if (barChart.dotLine) {
+          return barChart.dotLine.element.remove();
+        }
+      }
+    }
+  }
+}
+```
