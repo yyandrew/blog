@@ -89,3 +89,17 @@ plotOptions: {
   }
 }
 ```
+
+5.保持y轴始终在图表的底部
+
+``` javascript
+yAxis: {
+  minRange: 0.1
+}
+# 如果是line图表还要添加下面代码
+plotOptions: {
+  line: {
+    softThreshold: false
+  }
+}
+```
