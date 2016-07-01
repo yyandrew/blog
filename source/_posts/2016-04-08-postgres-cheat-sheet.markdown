@@ -23,3 +23,9 @@ dbname=# ALTER TABLE tablename ALTER COLUMN last_updated_at SET DEFAULT now(); #
 launchctl unload ~/Library/LaunchAgents/homebrew.mxcl.postgresql.plist # 停止postgres服务
 launchctl load ~/Library/LaunchAgents/homebrew.mxcl.postgresql.plist # 启动postgres服务
 ```
+
+### 怎么使用`git reflog`
+```
+git reflog
+git reset --hard HEAD@{1}
+```
