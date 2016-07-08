@@ -90,3 +90,13 @@ $ chmod 700 ~/.ssh
 ```bash
 $ wget -qO- bench.sh | bash
 ```
+
+* pure-ftps使用(centos)
+```bash
+# 基本操作
+service pure-ftpd start # 启动pure-ftpd服务
+service pure-ftpd stop # 停止pure-ftpd服务
+# 修改已存在用户的密码
+pure-pw passwd username
+pure-pw mkdb
+```
