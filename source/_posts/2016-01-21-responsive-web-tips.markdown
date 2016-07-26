@@ -73,3 +73,10 @@ input[type="tex"]::-ms-clear {
 }
 
 ```
+5.设置`position: absolute;`元素的宽度随着内容自动适应
+```css
+.tip {
+  position: absolute;
+  white-space: nowrap; # 重要属性，魔法糖
+}
+```

@@ -9,6 +9,13 @@ categories: "postgres"
 ```sh
 psql -U username dbname
 ```
+### 创建新数据库
+```sh
+su postgres # 切换posgresql管理员
+psql # 进入终端
+
+postgres=# create database "new_db" owner "owener_name"; # 创建新数据库new_db，所有者是owner_name
+```
 ### 表操作
 ```sh
 dbname=# \d tablename; # 显示表的结构
@@ -22,10 +29,4 @@ dbname=# ALTER TABLE tablename ALTER COLUMN last_updated_at SET DEFAULT now(); #
 ``` sh
 launchctl unload ~/Library/LaunchAgents/homebrew.mxcl.postgresql.plist # 停止postgres服务
 launchctl load ~/Library/LaunchAgents/homebrew.mxcl.postgresql.plist # 启动postgres服务
-```
-
-### 怎么使用`git reflog`
-```
-git reflog
-git reset --hard HEAD@{1}
 ```

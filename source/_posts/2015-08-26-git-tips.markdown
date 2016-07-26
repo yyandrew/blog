@@ -33,3 +33,8 @@ git revert 16bdac68de
 git tag -l
 git checkout target_tag
 ```
+* 怎么使用`git reflog`
+```
+git reflog
+git reset --hard HEAD@{1}
+```
