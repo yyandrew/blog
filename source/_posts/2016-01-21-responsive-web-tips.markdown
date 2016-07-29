@@ -80,3 +80,40 @@ input[type="tex"]::-ms-clear {
   white-space: nowrap; # 重要属性，魔法糖
 }
 ```
+6.设置元素的`pointer-events`使`select`的`option`打开事件不会被上面遮盖的元素失效
+```html
+<div class='select-menu'>
+  <select class='age'>
+    <option value='18' data-uname='Julian Levine'>18</option>
+    <option value='19' data-uname='Reshma Kalimi'>19</option>
+    <option value='20' data-uname='Julian Levine'>20</option>
+    ...
+  </select>
+  <div class='uname'></div>
+</div>
+```
+```scss
+.select-menu {
+  position: relative;
+  select {
+    adding-left: 20px;
+    width: auto !important;
+    min-width: 270px;
+    border-color: #ff9c00;
+    background-color: #303030;
+    font-size: 14px !important;
+    font-weight: bold;
+  }
+  .uname {
+    position: absolute;
+    top: 1px;
+    background-color: #333333;
+    left: 103px;
+    height: 38px;
+    line-height: 38px;
+    width: 120px;
+    pointer-events: none; # 重要 语法糖
+  }
+}
+
+```
