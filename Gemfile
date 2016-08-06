@@ -1,4 +1,6 @@
 source "https://ruby.taobao.org"
+gem 'execjs'
+gem 'therubyracer', :platforms => :ruby
 
 group :development do
   gem 'rake', '~> 10.0'
