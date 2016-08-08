@@ -26,3 +26,8 @@ python manage.py runserver
 ```sh
 python manage.py startapp main_app # 新建一个名称为`main_app`的应用
 ```
+### migration
+```sh
+python manage.py makemigration # 创建一个新的migration文件
+python manage.py migrate # 运行migration
+```
