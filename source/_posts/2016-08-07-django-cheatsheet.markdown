@@ -21,7 +21,7 @@ django-admin startproject APP_NAME
 ```sh
 python manage.py runserver
 ```
-### 访问项目 [129.0.0.1:8000](http://127.0.0.1:8000)
+### 访问项目 [127.0.0.1:8000](http://127.0.0.1:8000)
 ### 新建一个新的`app`
 ```sh
 python manage.py startapp main_app # 新建一个名称为`main_app`的应用
