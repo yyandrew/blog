@@ -100,3 +100,8 @@ service pure-ftpd stop # 停止pure-ftpd服务
 pure-pw passwd username
 pure-pw mkdb
 ```
+
+* 获取当前ip地址
+```bash
+ifconfig | sed -En 's/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p'
+```
