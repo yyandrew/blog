@@ -6,7 +6,7 @@ comments: true
 categories: "Git"
 ---
 事情的经过是这样的，本人像平常一下准备将做完的代码push到远程
-```bash
+``` bash
 $ git pull origin staging
 ```
 结果等待我的是
@@ -22,21 +22,21 @@ If that is not the case, please
         rm -fr "/Users/andrew/Development/sonar/.git/rebase-apply"
 ```
 什么？怎么会报错？不管先终止rebase再说
-```bash
+``` bash
 $ git rebase --abort
 ```
 再重新做pull
-```bash
+``` bash
 $ git pull origin staging
 ```
 结果如下
-```bash
+``` bash
 From git.example.com:app
  * branch            staging    -> FETCH_HEAD
 Current branch staging is up to date.
 ```
 貌似一切正常.然后做push代码到远程
-```bash
+``` bash
 $ git push origin staging
 ```
 结果如下
@@ -45,7 +45,7 @@ Everything up-to-date
 ```
 什么？没有代码被push。预感不好，要跪，赶紧`git log`，我的commit不见了，感觉天要塌下来了:(
 赶紧救助google。终于找到一些[解决方法](http://stackoverflow.com/a/2693668)
-```bash
+``` bash
 $ git reflog | grep 50554 # 50554是commit信息的关键字
 def8c08 HEAD@{5}: commit: FEEDBACK #50554
 $ git reset --hard HEAD@{5}

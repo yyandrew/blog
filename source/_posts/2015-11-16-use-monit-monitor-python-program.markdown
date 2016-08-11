@@ -41,7 +41,7 @@ exit 0
 ```
 
 3.使用方法
-```bash
+``` bash
 monit start exam-python # 启动对exam-python的监控
 monit stop exam-python # 终止监控
 ```

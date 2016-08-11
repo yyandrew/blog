@@ -6,11 +6,11 @@ comments: true
 categories: "System"
 ---
 * 显示硬盘使用状态
-```bash
+``` bash
 df -h --total
 ```
 * 显示文件夹或者文件大小
-```bash
+``` bash
 # 显示当前文件夹大小
 du -s -h .
 # 显示file1大小
@@ -21,28 +21,28 @@ du -s -h ./*
 find ~/test_dir -type f | wc -l
 ```
 * 删除所有空文件夹
-```bash
+``` bash
 find . -type d -empty -delete
 ```
 * 显示当前文件夹及其子文件夹大于20M并且小于30M的文件
-```bash
+``` bash
 find / -type f -size +20M -size -30M -exec ls -lh {} \; | awk '{ print $9 ": " $5 }'
 ```
 * 显示所有被监听的端口及其程序
-```bash
+``` bash
 sudo netstat -tulpn # t指tcp协议, u指udp协议,l指指显示被监听,p指显示程序名称,n指以ip地址+端口显示地址而不是以字符显示
 ```
 * 生成公钥
-```bash
+``` bash
 ssh-keygen -t rsa # 一路回车到底
 cat ~/.ssh/id_rsa.pub | ssh user@host "mkdir ~/.ssh; cat >> ~/.ssh/authorized_keys"
 ```
 * 随机生成32位密码
-```bash
+``` bash
 openssl rand -base64 32
 ```
 * 生成100M的大文件
-```bash
+``` bash
 fallocate -l 100M test.img
 ```
 * rsync备份系统
@@ -52,7 +52,7 @@ rsync -azvP /etc/* username@remote_host:/backup/ #注意敏感文件的权限
 ```
 
 * iptables操作
-```bash
+``` bash
 sudo iptables -A INPUT -p tcp -m tcp --dport 80 -j ACCEPT # 添加一个开放80端口的规则
 sudo iptables -I INPUT -s x.x.x.x -j DROP # 阻止ip为x.x.x.x的所有访问
 sudo iptables -nL --line-numbers # 显示所有规则并带行号
@@ -64,7 +64,7 @@ sudo iptables-save > /root/rule.file # 将当前防火墙规则保存到/root/ru
 sudo iptables-restore < /root/rule.file # 使用/root/rule.file的规则
 ```
 * mysql操作
-```bash
+``` bash
 $ mysql # 进入mysql控制台
 mysql> select * from mysql.user; # 显示所有用户
 mysql> create database your_db_name;
@@ -80,19 +80,20 @@ $ mysql database_name < db_back.sql # 导入一个sql备份文件
 $ mysql database_name > db_back.sql # 备份database_name数据库
 ```
 * 上传id_rsa.pub之后ssh免密码登录失效的另类解决方法
-```bash
+``` bash
 $ chmod 600 ~/.ssh/authorized_keys
 $ chmod 600 ~/.ssh/id_rsa
 $ chmod 700 ~/.ssh/id_rsa.pub
 $ chmod 700 ~/.ssh
 ```
 * 测试linux服务器的性能
-```bash
+``` bash
 $ wget -qO- bench.sh | bash
 ```
 
 * pure-ftps使用(centos)
-```bash
+
+``` bash
 # 基本操作
 service pure-ftpd start # 启动pure-ftpd服务
 service pure-ftpd stop # 停止pure-ftpd服务
@@ -102,6 +103,6 @@ pure-pw mkdb
 ```
 
 * 获取当前ip地址
-```bash
+``` bash
 ifconfig | sed -En 's/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p'
 ```

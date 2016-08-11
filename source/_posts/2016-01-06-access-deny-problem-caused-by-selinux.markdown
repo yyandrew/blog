@@ -11,7 +11,7 @@ categories: "System"
 如果你地发现`/var/log/audit/audit.log`中出现了`type=AVC msg=audit(1452058471.094:70): avc:  denied  { open } for  pid=1819 comm="php-fpm" name="index.php" dev=dm-0 ino=12716944 scontext=system_u:system_r:httpd_t:s0 tcontext=unconfined_u:object_r:user_home_t:s0 tclass=file`(关键字type=AVC)之类的错误信息，那么你需要用到下面的解决方法。
 
 以`php-fpm`(来自错误信息中comm的值)为例, 解决方法如下
-```bash
+``` bash
 grep php-fpm /var/log/audit/audit.log | audit2allow -M php-fpm
 semodule -i php-fpm.pp
 semodule -R

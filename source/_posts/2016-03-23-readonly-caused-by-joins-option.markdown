@@ -6,7 +6,7 @@ comments: true
 categories: "Rails"
 ---
 今天碰到一个非常奇怪的问题,下面是错误的重新步骤。
-```bash
+``` bash
 pry(main)> product = Product.query_by_name("shanghai").first
 pry(main)> product.update_attribute(:is_delete, true)
   (0.1ms)  BEGIN
@@ -19,7 +19,7 @@ from /Users/andrew/.rvm/gems/ruby-1.9.3-p551@litool/gems/activerecord-3.2.13/lib
 
 原来是在使用`joins`时会强制使用`readonly`
 
-```ruby
+``` ruby
 class Product < ActiveRecord::Base
   ...
   scope :query_by_name, lambda { |name|
