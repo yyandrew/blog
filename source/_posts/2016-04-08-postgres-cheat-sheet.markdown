@@ -22,6 +22,9 @@ dbname=# \d tablename; # 显示表的结构
 dbname=# ALTER TABLE tablename ADD COLUMN newcolumn integer; # [字段类型](http://www.postgresql.org/docs/9.3/static/datatype.html#DATATYPE-TABLE)
 dbname=# ALTER TABLE tablename DROP COLUMN oldcolumn; # 删除字段
 dbname=# ALTER TABLE tablename ALTER COLUMN last_updated_at SET DEFAULT now(); # 设置默认值
+dbname=# SELECT * FROM pg_indexes WHERE TABLENAME='your_table'; # 显示your_table的索引
+dbname=# EXPLAIN ANALYZE SELECT * FROM your_table WHERE name='andrew'; # 显示查询详细步骤
+dbname=# SELECT to_tsvector('english', 'a fat  cat sat on a mat - it ate a fat rats'); # 转换一句话转换成tsvector格式
 ```
 
 ### 重新启动postgres(Mac OSX系统，brew安装)
