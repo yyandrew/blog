@@ -3,7 +3,7 @@ layout: post
 title: "开启php的调试模式"
 date: 2015-11-15 16:42
 comments: true
-categories: "php"
+categories: "PHP"
 ---
 在安装php的应用的时候会遇到问题，但是没有错误提示，之所以会看不到是因为php.ini将这些信息隐藏了。我们可以通过设置php.ini让这些错误信息显示出来。
 ```php

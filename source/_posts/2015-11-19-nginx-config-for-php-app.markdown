@@ -3,7 +3,7 @@ layout: post
 title: "运行php的nginx配置文件"
 date: 2015-11-19 05:54
 comments: true
-categories: "php"
+categories: "PHP"
 ---
 nginx运行php应用的配置的示例
 

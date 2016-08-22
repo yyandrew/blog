@@ -3,7 +3,7 @@ layout: post
 title: "在centos中重置root的密码"
 date: 2015-11-14 18:53
 comments: true
-categories: "system"
+categories: "System"
 ---
 
 1. 开机启动时不停按`CTRL+SHIFT+1`直到出现GRUB菜单
