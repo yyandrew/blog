@@ -106,3 +106,18 @@ pure-pw mkdb
 ``` bash
 ifconfig | sed -En 's/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p'
 ```
+
+* 备份及还原gpg keys
+``` sh
+# 备份
+cp ~/.gnupg/pubring.gpg /path/to/backups/
+cp ~/.gnupg/secring.gpg /path/to/backups/
+cp ~/.gnupg/trustdb.gpg /path/to/backups/
+# or, instead of backing up trustdb...
+# gpg --export-ownertrust > chrisroos-ownertrust-gpg.txt
+
+# 还原
+cp /path/to/backups/*.gpg ~/.gnupg/
+# or, if you exported the ownertrust
+# gpg --import-ownertrust chrisroos-ownertrust-gpg.txt
+```
