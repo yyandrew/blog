@@ -5,8 +5,8 @@ date: 2016-08-24 07:29:50 +0800
 comments: true
 categories: "Nginx"
 ---
-### 设置
-在nginx配置文件中的http {}, server {}, location {}添加下面代码：
+### 设置`expires`
+`expires`可以设置在在nginx配置文件中的http {}, server {}或者location {}中，但是通常被放在location {}中
 ``` irc
 location ~*  \.(jpg|jpeg|png|gif|ico|css|js)$ {
   expires 365d; # 缓存有效期是一年
