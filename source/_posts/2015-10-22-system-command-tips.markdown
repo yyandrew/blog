@@ -121,3 +121,9 @@ cp /path/to/backups/*.gpg ~/.gnupg/
 # or, if you exported the ownertrust
 # gpg --import-ownertrust chrisroos-ownertrust-gpg.txt
 ```
+
+# 显示使用频率最高的前10的Linux命令
+
+``` sh
+history | awk '{CMD[$2]++;count++;} END { for (a in CMD )print CMD[ a  ]" " CMD[ a  ]/count*100 "% " a  }' | grep -v "./" | column -c3 -s " " -t |sort -nr | nl | head -n10 
+```
