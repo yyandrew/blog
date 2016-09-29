@@ -21,7 +21,7 @@ categories: "Tool"
 
 固件刷完后，焊接所有的二极管，注意方向。二极管箭头应该和线路板上的标志一致。
 
-插上电脑进行测试，使用[[https://www.baidu.com/s?wd=keyboardtestutility&ie=UTF-8|keyboardtestutility]]进行测试。用镊子短路两个轴之间的点，观察是否所有按键都有反应。
+插上电脑进行测试，使用[keyboardtestutility](https://www.baidu.com/s?wd=keyboardtestutility&ie=UTF-8|)进行测试。用镊子短路两个轴之间的点，观察是否所有按键都有反应。
 如果全部正常，进行下一步
 如果不正常，参见[[GH60相关#常见问题]]。
 
@@ -38,7 +38,7 @@ B版焊接上灯阻；
 如果可以就可以焊接了。
 
 ## 刷固件
-首先下载[[https://github.com/kairyu/tkg-toolkit/archive/master.zip|tkg-toolkit]]解压到你喜欢的地方。
+首先下载[tkg-toolkit](https://github.com/kairyu/tkg-toolkit/archive/master.zip)解压到你喜欢的地方。
 插上键盘，打开`tkg-toolkit\windows\setup.bat`,依次选择`1(GH60 RevA/B/C) 然后回车`/`n 然后回车`/`1 回车`/`1 回车`,按任意键保存退出。
 接着打开`tkg-toolkit\windows\reflash.bat`，输入`y`后，按下键盘背面的RESET键。这时候就开始刷新固件了。
 如果固件刷新不成功，参见[[GH60相关#常见问题]]。
