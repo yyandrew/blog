@@ -127,3 +127,10 @@ cp /path/to/backups/*.gpg ~/.gnupg/
 ``` sh
 history | awk '{CMD[$2]++;count++;} END { for (a in CMD )print CMD[ a  ]" " CMD[ a  ]/count*100 "% " a  }' | grep -v "./" | column -c3 -s " " -t |sort -nr | nl | head -n10 
 ```
+
+# 在`curl`命令中添加用户参数信息
+
+``` sh
+curl -X POST -u "username:password" -F file=@/file_path/Exemple-export.xml http://localhost:3000/upload
+```
+
