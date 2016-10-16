@@ -32,4 +32,5 @@ dbname=# SELECT to_tsvector('english', 'a fat  cat sat on a mat - it ate a fat r
 ``` sh
 launchctl unload ~/Library/LaunchAgents/homebrew.mxcl.postgresql.plist # 停止postgres服务
 launchctl load ~/Library/LaunchAgents/homebrew.mxcl.postgresql.plist # 启动postgres服务
+tail -f /usr/local/var/postgres/server.log # postgresql的日志文件
 ```
