@@ -134,3 +134,8 @@ history | awk '{CMD[$2]++;count++;} END { for (a in CMD )print CMD[ a  ]" " CMD[
 curl -X POST -u "username:password" -F file=@/file_path/Exemple-export.xml http://localhost:3000/upload
 ```
 
+# 修改默认的编辑器
+
+``` sh
+sudo update-alternatives --config editor
+```
