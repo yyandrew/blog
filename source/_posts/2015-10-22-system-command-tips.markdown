@@ -139,3 +139,9 @@ curl -X POST -u "username:password" -F file=@/file_path/Exemple-export.xml http:
 ``` sh
 sudo update-alternatives --config editor
 ```
+
+# 检查所有有ssh连接
+
+``` sh
+netstat -algrep ssh
+```
