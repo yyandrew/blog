@@ -6,9 +6,17 @@ comments: true
 categories: "System"
 ---
 * 显示硬盘使用状态
+
 ``` bash
 df -h --total
 ```
+
+* 测试硬盘IO速度
+
+``` bash
+dd if=/dev/zero of=/tmp/output conv=fdatasync bs=384k count=1k; rm -f /tmp/output
+```
+
 * 显示文件夹或者文件大小
 ``` bash
 # 显示当前文件夹大小
@@ -144,4 +152,36 @@ sudo update-alternatives --config editor
 
 ``` sh
 netstat -algrep ssh
+```
+
+# 升级mac os的node
+
+``` sh
+sudo npm cache clean -f
+sudo npm install -g n
+sudo n stable
+node -v # 检查版本号
+```
+
+# apt命令使用
+
+``` sh
+apt-cache pkgnames # 查看操作系统所有可以使用的工具
+apt-cache search nginx # 查看nginx的名字和简要ras描述
+apt-cache showpkg nginx # 查看nginx的依赖
+apt-cache show nginx # 查看nginx详细信息
+apt-cache stats # 查看cache的状态
+apt-get install nginx # 安装或者更新nginx, 加上‘–no-upgrade’可以不更新
+apt-get install nginx --only-upgrade # 只更新nginx
+apt-get install nginx=1.2.1-2.2+wheezy4 # 只安装1.2.1-2.2+wheezy4的nginx
+apt-get purge nginx # 卸载nginx，包含配置文件
+apt-get clean # 删除下载的.deb文件，释放硬盘空间
+apt-get --download-only source nginx # 只下载源码
+apt-get source nginx # 下载源码并解压
+apt-get --compile source nginx # 下载源码，解压，编译
+apt-get download nginx # 仅仅下载
+apt-get changelog nginx # 查看更新日志
+apt-get check # 查看是否有损坏依赖包
+apt-get build-dep nginx # 搜索安装nginx的依赖包
+apt-get autoclean # 清空cache
 ```
