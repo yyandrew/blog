@@ -6,7 +6,7 @@ comments: true
 categories: "Rails"
 ---
 
-### 添加断点
+## 添加断点
 ``` ruby
 ... code ...
 debugger
@@ -14,13 +14,13 @@ debugger
 # byebug
 ... code ...
 ```
-### 重复上一次命令
+## 重复上一次命令
 按`Enter`
 
-### 退出当前程序
+## 退出当前程序
 `q` 或者 `kill`
 
-### 其它常用命令
+## 其它常用命令
 
 * `c <linenumber>` 继续运行直到代码结束或者到指定的**linenumber**
 * `n <linenumber>` 继续运行到下一行或者指定的**linenumber**
