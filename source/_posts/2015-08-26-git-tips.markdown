@@ -38,3 +38,8 @@ git checkout target_tag
 git reflog
 git reset --hard HEAD@{1}
 ```
+
+* 怎么提取历史版本的文件，比如提取两次提交的文件index.js
+```
+git checkout HEAD~2 -- index.js
+```

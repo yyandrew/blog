@@ -21,3 +21,9 @@ categories: "Rails"
 
   > model
   >> `rails g model Client name:string`
+
+## Round employee_growth to two decimal and then group
+
+```ruby
+Company.where('employee_growth IS NOT NULL').select('round(employee_growth::numeric, 2) AS round_employee_growth').order("round_employee_growth_numeric_2 ASC").group('round(employee_growth::numeric, 2)').count('round(employee_growth::numeric, 2)')
+```

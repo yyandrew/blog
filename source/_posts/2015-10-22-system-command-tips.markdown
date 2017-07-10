@@ -130,31 +130,35 @@ cp /path/to/backups/*.gpg ~/.gnupg/
 # gpg --import-ownertrust chrisroos-ownertrust-gpg.txt
 ```
 
-# 显示使用频率最高的前10的Linux命令
+* 显示使用频率最高的前10的Linux命令
 
 ``` sh
 history | awk '{CMD[$2]++;count++;} END { for (a in CMD )print CMD[ a  ]" " CMD[ a  ]/count*100 "% " a  }' | grep -v "./" | column -c3 -s " " -t |sort -nr | nl | head -n10 
 ```
 
-# 在`curl`命令中添加用户参数信息
+* CURL命令
 
 ``` sh
+# 在`curl`命令中添加用户参数信
 curl -X POST -u "username:password" -F file=@/file_path/Exemple-export.xml http://localhost:3000/upload
+
+# 发送一个put请求并且带上参数
+curl -i -X PUT http://localhost:3000/games/5920624ebfda25d15fc6486e --data '{"title": "abc123", "cover": "abc123"}' -H "Content-Type: application/json
 ```
 
-# 修改默认的编辑器
+* 修改默认的编辑器
 
 ``` sh
 sudo update-alternatives --config editor
 ```
 
-# 检查所有有ssh连接
+* 检查所有有ssh连接
 
 ``` sh
 netstat -algrep ssh
 ```
 
-# 升级mac os的node
+* 升级mac os的node
 
 ``` sh
 sudo npm cache clean -f
@@ -163,7 +167,7 @@ sudo n stable
 node -v # 检查版本号
 ```
 
-# apt命令使用
+* apt命令使用
 
 ``` sh
 apt-cache pkgnames # 查看操作系统所有可以使用的工具
