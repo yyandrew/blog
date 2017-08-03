@@ -3,7 +3,7 @@
 # Defines a single server with a list of roles and multiple properties.
 # You can define all roles on a single server, or split them:
 
- server '104.236.177.134', user: 'andrew', roles: %w{web app}
+ server 'blog.splane.space', user: 'andrew', roles: %w{web app}
 
 
 # role-based syntax
@@ -14,9 +14,9 @@
 # property set. Specify the username and a domain or IP for the server.
 # Don't use `:all`, it's a meta role.
 
-role :app, %w{104.236.177.134}
-role :web, %w{104.236.177.134}
-role :db,  %w{104.236.177.134}
+role :app, %w{blog.splane.space}
+role :web, %w{blog.splane.space}
+role :db,  %w{blog.splane.space}
 
 
 
