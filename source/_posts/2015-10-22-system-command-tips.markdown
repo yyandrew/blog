@@ -189,3 +189,8 @@ apt-get check # 查看是否有损坏依赖包
 apt-get build-dep nginx # 搜索安装nginx的依赖包
 apt-get autoclean # 清空cache
 ```
+
+# 根据关键字终止进程
+```sh
+kill -9 $(ps aux | grep 'git' | awk '{print $2}') # 查出所有git进程，并终止它们
+```
