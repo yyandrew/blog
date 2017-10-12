@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Git常常用命令"
+title: "Git常用命令"
 date: 2015-08-26 15:18
 comments: true
 categories: "Git"
@@ -28,10 +28,11 @@ git push origin :branch_name1
 ``` bash
 git revert 16bdac68de
 ```
-* 跳转到指定tag
+* tag操作
 ``` bash
-git tag -l
-git checkout target_tag
+git fetch --all --tags --prune  // 更新本地的tags
+git tag -l // 列出所有的tags
+git checkout tags/target_tag // 跳到指定tag
 ```
 * 怎么使用`git reflog`
 ```
