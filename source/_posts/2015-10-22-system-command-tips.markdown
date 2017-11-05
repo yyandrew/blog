@@ -71,7 +71,9 @@ sudo /etc/init.d/iptables save # 使修改生效
 sudo iptables-save > /root/rule.file # 将当前防火墙规则保存到/root/rule.file
 sudo iptables-restore < /root/rule.file # 使用/root/rule.file的规则
 ```
+
 * mysql操作
+
 ``` bash
 $ mysql # 进入mysql控制台
 mysql> select * from mysql.user; # 显示所有用户
@@ -87,6 +89,7 @@ mysql> grant all privileges on your_db_name.* to your_user@localhost ; 设置dat
 $ mysql database_name < db_back.sql # 导入一个sql备份文件
 $ mysql database_name > db_back.sql # 备份database_name数据库
 ```
+
 * 上传id_rsa.pub之后ssh免密码登录失效的另类解决方法
 ``` bash
 $ chmod 600 ~/.ssh/authorized_keys
@@ -133,7 +136,7 @@ cp /path/to/backups/*.gpg ~/.gnupg/
 * 显示使用频率最高的前10的Linux命令
 
 ``` sh
-history | awk '{CMD[$2]++;count++;} END { for (a in CMD )print CMD[ a  ]" " CMD[ a  ]/count*100 "% " a  }' | grep -v "./" | column -c3 -s " " -t |sort -nr | nl | head -n10 
+history | awk '{CMD[$2]++;count++;} END { for (a in CMD )print CMD[ a  ]" " CMD[ a  ]/count*100 "% " a  }' | grep -v "./" | column -c3 -s " " -t |sort -nr | nl | head -n10
 ```
 
 * CURL命令
@@ -193,4 +196,9 @@ apt-get autoclean # 清空cache
 # 根据关键字终止进程
 ```sh
 kill -9 $(ps aux | grep 'git' | awk '{print $2}') # 查出所有git进程，并终止它们
+```
+
+# 断点下载大文件的方法
+```sh
+rsync -P -e ssh user@host:remote_file local_file
 ```
