@@ -202,3 +202,8 @@ kill -9 $(ps aux | grep 'git' | awk '{print $2}') # 查出所有git进程，并�
 ```sh
 rsync -P -e ssh user@host:remote_file local_file
 ```
+
+# grep使用方法
+```sh
+sudo grep -Rw / -e 'check_root' # R - all files under each directory, recursively, following symbolic links, w - select only those lines containing matches
+```
