@@ -12,7 +12,8 @@ categories: "Rails"
 
 ``` sh
 apt-get update
-apt-get install curl git build-essential zlibc zlib1g-dev zlib1g libcurl4-openssl-dev libssl-dev libopenssl-ruby libapr1-dev libaprutil1-dev libreadline6 libreadline6-dev
+
+apt-get install curl git build-essential zlibc zlib1g-dev zlib1g libcurl4-openssl-dev libssl-dev libopenssl-ruby libapr1-dev libaprutil1-dev libreadline6 libreadline6-dev -y
 ```
 
 ## 创建新的用户
@@ -59,18 +60,17 @@ chmod -R g+w /var/www
 ```sh
 gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3
 \curl https://raw.githubusercontent.com/rvm/rvm/master/binscripts/rvm-installer | bash -s stable
+source /etc/profile.d/rvm.sh  # able to use rvm
 rvm install 2.3.1
 rvm use 2.3.1
 rvm gemset use gh60-club --create
 gem install bundler --no-ri --no-rdoc
-source /etc/profile.d/rvm.sh  # able to use rvm
-
 ```
 
 ## 安装nginx
 
 ``` sh
-apt-get install nginx
+apt-get install nginx -y
 groupadd nginx
 usermod -a -G nginx wyb
 ```
@@ -80,7 +80,7 @@ usermod -a -G nginx wyb
 ``` sh
 wget http://download.redis.io/releases/redis-stable.tar.gz
 tar xzf redis-stable.tar.gz
-apt-get install tcl8.5
+apt-get install tcl8.5 -y
 cd redis-stable
 make
 make test
@@ -93,10 +93,10 @@ cd utils
 ## 安装postgresql
 
 ``` sh
-apt-get install postgresql postgresql-contrib
-apt-get install libpq-dev
+apt-get install postgresql postgresql-contrib -y
+apt-get install libpq-dev -y
 su postgres
-createuser --createdb --superuser -Upostgres wyb
+createuser --createdb --superuser -U postgres wyb
 
 psql -c "ALTER USER wyb WITH PASSWORD ''"
 
@@ -112,7 +112,7 @@ RAILS_ENV=production bundle exec rake db:migrate
 ## 安装monit
 
 ``` sh
-apt-get install monit
+apt-get install monit -y
 ```
 
 ## import link files
@@ -150,4 +150,13 @@ apt-key update
 
 ``` sh
 apt-get update;apt-get upgrade;wget -q https://www.rootusers.com/wp-content/uploads/2015/08/update.txt -O /etc/apt/sources.list;apt-get update;apt-get upgrade;apt-get dist-upgrade;apt-get autoremove;cat /etc/debian_version;echo "The above number shows the current Debian version. It is highly recommended that you reboot the system."
+```
+
+Options:
+
+## Install java on ubuntu
+
+``` sh
+apt-get install default-jre
+apt-get install default-jdk
 ```
