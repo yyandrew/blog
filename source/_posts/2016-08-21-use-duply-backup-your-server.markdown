@@ -143,8 +143,8 @@ MAX_FULL_BACKUPS=5 # 最多保持5个备份版本
 #### 创建Cronjob
 
 ``` sh
-0 0 * * 7 /usr/bin/duply /root/.duply/hostname full_verify_purge --force # 每星期天做一次完整备份
-0 0 * * 1-6 /usr/bin/duply /root/.duply/hostname incr # 每星期一至六做一次增量备份
+0 0 * * 7 /usr/bin/duply /root/.duply/hostname pre_full_verify_purge_post --force # 每星期天做一次完整备份
+0 0 * * 1-6 /usr/bin/duply /root/.duply/hostname pre_incr_post # 每星期一至六做一次增量备份
 ```
 
 #### 小贴士

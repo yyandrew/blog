@@ -55,3 +55,10 @@ initdb /usr/local/var/postgres -E utf8 --locale=zh_CN.UTF-8 --lc-collate=zh_CN.U
 ``` sh
 pg_upgrade -b /usr/local/Cellar/postgresql/9.4.5/bin -B /usr/local/Cellar/postgresql/9.6.1/bin/ -d /usr/local/var/postgres9.4/postgres94 -D /usr/local/var/postgres
 ```
+
+### 数据库备份及恢复
+
+``` sh
+pg_dump -U username -d database_name -t table_name > ~/sites.sql # 导出单独的表
+psql -U username -d database_name < sites.sql # 导入单独的表
+```
