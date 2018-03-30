@@ -115,6 +115,10 @@ RAILS_ENV=production bundle exec rake db:migrate
 apt-get install monit -y
 ```
 
+将下面内容添加到**visudo**文件里，运行`sudo monit summary`命令时不需要输入密码
+```
+wyb     ALL=NOPASSWD:/usr/bin/monit
+```
 ## import link files
 scp wyb@hostname:/var/www/gh60-club/shared/config/* /var/www/gh60-club/shared/config/
 
