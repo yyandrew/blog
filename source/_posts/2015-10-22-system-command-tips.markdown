@@ -36,6 +36,12 @@ find . -type d -empty -delete
 ``` bash
 find / -type f -size +20M -size -30M -exec ls -lh {} \; | awk '{ print $9 ": " $5 }'
 ```
+
+* 查找所有excel文件
+``` bash
+find . -type f -name *.xlsx
+```
+
 * 显示所有被监听的端口及其程序
 ``` bash
 sudo netstat -tulpn # t指tcp协议, u指udp协议,l指指显示被监听,p指显示程序名称,n指以ip地址+端口显示地址而不是以字符显示
