@@ -57,3 +57,10 @@ git bisect reset # 结束一个bisect
 ```
 
 [参考链接](https://www.metaltoad.com/blog/beginners-guide-git-bisect-process-elimination)
+
+* 批量修改历史提交(比如提交者的信息)
+```
+git rebase -i B # B是要修改的提交的一次或者几次提交的commit，如果想要修改第一次的提交B可以使用--root
+git commit --amend --author="yyandrew <qqerqqer@126.com>" # 修改提交者的信息
+git rebase --continue # 继续进行一下rebase，如果没有下一个会自动终止
+```
