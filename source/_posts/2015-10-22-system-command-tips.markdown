@@ -213,3 +213,11 @@ rsync -P -e ssh user@host:remote_file local_file
 ```sh
 sudo grep -Rw / -e 'check_root' # R - all files under each directory, recursively, following symbolic links, w - select only those lines containing matches
 ```
+
+# /bin/bash: warning: setlocale: LC_ALL: cannot change locale (en_US.UTF-8)错误的解决方法
+```
+echo "LC_ALL=en_US.UTF-8" >> /etc/environment
+echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen
+echo "LANG=en_US.UTF-8" > /etc/locale.conf
+locale-gen en_US.UTF-8
+```
