@@ -31,7 +31,7 @@ git revert 16bdac68de
 * tag操作
 ``` bash
 git fetch --all --tags --prune  // 更新本地的tags
-git tag -l // 列出所有的tags
+git tag -l --sort=-version:refname "v*" // 列出所有的tags并排序
 git checkout target_tag // 跳到指定tag
 git tag -d target_tag
 ```
