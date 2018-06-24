@@ -1,5 +1,5 @@
 GEM
-  remote: https://ruby.taobao.org/
+  remote: https://gems.ruby-china.com/
   specs:
     RedCloth (4.2.9)
     addressable (2.4.0)
@@ -142,4 +142,4 @@ DEPENDENCIES
   therubyracer
 
 BUNDLED WITH
-   1.10.6
+   1.16.2
