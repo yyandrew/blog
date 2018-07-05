@@ -21,7 +21,7 @@ function this_in_func() {
   console.log(this == window)
 }
 
-this_in_func() // 输出:true
+this_in_func() // 输出:true.注意如果运行使用了`strict`模式，这时this为undefined
 ```
 
 ``` javascript
@@ -44,7 +44,7 @@ const hero = {
     console.log(`I am ${this.heroName}`)
   }
 }
-hero.dialogue()
+hero.dialogue() //输出:I am Batman
 ```
 
 ## call()和apply()中的this
