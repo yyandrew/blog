@@ -164,3 +164,10 @@ Options:
 apt-get install default-jre
 apt-get install default-jdk
 ```
+
+options:
+## Firewall problem on CentOS
+```
+iptables -A INPUT -p tcp -m tcp --dport 80 -j ACCEPT
+iptables -A INPUT -p tcp -m tcp --dport 443 -j ACCEPT
+```
