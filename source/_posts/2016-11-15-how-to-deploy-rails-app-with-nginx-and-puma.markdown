@@ -63,7 +63,7 @@ gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB8
 source /etc/profile.d/rvm.sh  # able to use rvm
 rvm install 2.3.1
 rvm use 2.3.1
-rvm gemset use gh60-club --create
+rvm gemset use rate_tool --create
 gem install bundler --no-ri --no-rdoc
 ```
 
@@ -100,13 +100,21 @@ createuser --createdb --superuser -U postgres wyb
 
 psql -c "ALTER USER wyb WITH PASSWORD ''"
 
-psql -c "create database gh60_club owner wyb encoding 'UTF8' TEMPLATE template0;"
+psql -c "create database rate_tool owner wyb encoding 'UTF8' TEMPLATE template0;"
 
-psql -d gh60_club -c "CREATE EXTENSION hstore;"
+psql -d rate_tool -c "CREATE EXTENSION hstore;"
 
-psql -d gh60_club -c "CREATE EXTENSION pg_trgm;"
+psql -d rate_tool -c "CREATE EXTENSION pg_trgm;"
 
 RAILS_ENV=production bundle exec rake db:migrate
+```
+
+## 安装yarn
+```
+curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+sudo apt update
+sudo apt install yarn
 ```
 
 ## 安装monit
@@ -120,17 +128,26 @@ apt-get install monit -y
 wyb     ALL=NOPASSWD:/usr/bin/monit
 ```
 ## import link files
-scp wyb@hostname:/var/www/gh60-club/shared/config/* /var/www/gh60-club/shared/config/
+```
+scp -r /var/www/rate_tool/shared/config/* wyb@hostname:/var/www/rate_tool/shared/config/
+scp -r /etc/monit/conf.d/* wyb@hostname:/etc/monit/conf.d/
+scp -r /etc/monit/monitrc wyb@hostname:/etc/monit/monitrc
+scp bin/* wyb@hostname:/var/www/rate_tool/shared/bin/
+```
 
 ## import server scripts
-mkdir /var/www/gh60-club/shared/scripts
-scp wyb@hostname:/var/www/gh60-club/shared/scripts/* /var/www/gh60-club/shared/scripts/
-scp /etc/nginx/conf.d/gh60-club.conf root@hostname:/etc/nginx/sites-enabled/
-mkdir -p /etc/nginx/ssl/gh60_club
-scp /etc/nginx/ssl/gh60_club/* root@hostname:/etc/nginx/ssl/gh60_club/
+```
+mkdir /var/www/rate_tool/shared/scripts
+scp wyb@hostname:/var/www/rate_tool/shared/scripts/* /var/www/rate_tool/shared/scripts/
+scp /etc/nginx/conf.d/rate_tool.conf root@hostname:/etc/nginx/sites-enabled/
+mkdir -p /etc/nginx/ssl/rate_tool
+scp /etc/nginx/ssl/rate_tool/* root@hostname:/etc/nginx/ssl/rate_tool/
+```
 
 # import images
-scp -r wyb@hostname:/var/www/gh60-club/shared/public/uploads/* /var/www/gh60-club/shared/public/uploads
+```
+scp -r wyb@hostname:/var/www/rate_tool/shared/public/uploads/* /var/www/rate_tool/shared/public/uploads
+```
 
 # puma常用命令
 
@@ -170,4 +187,12 @@ options:
 ```
 iptables -A INPUT -p tcp -m tcp --dport 80 -j ACCEPT
 iptables -A INPUT -p tcp -m tcp --dport 443 -j ACCEPT
+```
+
+Options:
+```
+# 备份所有的数据库
+su - postgres -c 'mkdir /tmp/pg_backup; pg_dumpall > /tmp/pg_backup/^Cdumpall-$(date '+%F').sql'
+# 导入所有数据库
+psql -f  pgdumpall-2018-11-20.sql postgres
 ```

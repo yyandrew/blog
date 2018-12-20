@@ -58,6 +58,8 @@ openssl rand -base64 32
 * 生成100M的大文件
 ``` bash
 fallocate -l 100M test.img
+# OR
+time dd if=/dev/zero of=test.img bs=1G seek=100 count=0
 ```
 * rsync备份系统
 
@@ -220,4 +222,9 @@ echo "LC_ALL=en_US.UTF-8" >> /etc/environment
 echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen
 echo "LANG=en_US.UTF-8" > /etc/locale.conf
 locale-gen en_US.UTF-8
+```
+
+# 检查文件的md5/sha1/sha256
+```
+shasum -a 256 ~/Downloads/RubyMine-2018.2.dmg
 ```
