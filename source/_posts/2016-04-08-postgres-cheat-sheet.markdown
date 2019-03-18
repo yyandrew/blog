@@ -126,3 +126,11 @@ categories: "postgres"
 #### 检查备份是不是正常运行
 
 在主服务器上运行下面命令`sudo -u postgres psql -x -c "select * from pg_stat_replication;"`
+
+#### 将数据库导出为gzip及导入
+
+```
+sudo -u postgres pg_dump database | gzip > database.sql.gz
+dropdb database && createdb database
+gunzip < database.sql.gz | psql database
+```
