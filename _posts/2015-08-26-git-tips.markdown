@@ -1,0 +1,66 @@
+---
+layout: post
+title: "Git常用命令"
+date: 2015-08-26 15:18
+comments: true
+categories: "Git"
+---
+* 列出还没有被合并到master分支是的分支
+``` bash
+git branch --no-merged master
+```
+* .gitignore不起作用的解决方法
+``` bash
+git rm . -r --cached
+git add .
+git commit -m "fixed untracked files"
+```
+* 查看代码的历史
+``` bash
+git log -L <start>,<end>:<file> #start, end是方法开始，结束行号
+git log -L :<regex>:<file> #regex为正则表达式
+```
+* 删除远程分支
+``` bash
+git push origin :branch_name1
+```
+* 撤消一个已经push的commit(16bdac68de)
+``` bash
+git revert 16bdac68de
+```
+* tag操作
+``` bash
+git fetch --all --tags --prune  // 更新本地的tags
+git tag | sort -V // 列出所有的tags并排序
+git checkout target_tag // 跳到指定tag
+git tag -d target_tag
+```
+* 怎么使用`git reflog`
+```
+git reflog
+git reset --hard HEAD@{1}
+```
+
+* 怎么提取历史版本的文件，比如提取两次提交的文件index.js
+```
+git checkout HEAD~2 -- index.js
+```
+
+* 怎么使用git bisect
+
+``` sh
+git bisect start # 开始一个bisect
+git bisect good good_commit_hash # 设置功能正常的提交的commit hash
+git bisect bad bad_commit_hash # 设置功能不正常的提交的commit hash
+git bisect good/bad # 测试功能是不是正常，如果是正常的输入git bisect good，如果功能不正常输入git bisect bad，不断重复直到给出结果'137323c84ad24a81e8a351d70732af017d250d21 is the first bad commit'
+git bisect reset # 结束一个bisect
+```
+
+[参考链接](https://www.metaltoad.com/blog/beginners-guide-git-bisect-process-elimination)
+
+* 批量修改历史提交(比如提交者的信息)
+```
+git rebase -i B # B是要修改的提交的一次或者几次提交的commit，如果想要修改第一次的提交B可以使用--root
+git commit --amend --author="yyandrew <qqerqqer@126.com>" # 修改提交者的信息
+git rebase --continue # 继续进行一下rebase，如果没有下一个会自动终止
+```
