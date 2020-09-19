@@ -1,0 +1,19 @@
+name: Build and Deploy
+on:
+  push:
+    branches:
+      - blog_v2
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          persist-credentials: false
+      - name: Deploy Jekyll Site
+        uses: yyandrew/github-pages-deploy-action-for-jekyll@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ secrets.GITHUB_REPOSITORY }}
+          GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
