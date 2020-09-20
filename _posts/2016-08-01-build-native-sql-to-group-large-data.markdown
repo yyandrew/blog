@@ -9,7 +9,8 @@ categories: "Rails"
 
 #### 构建sql的方法
 
-```ruby app/models/user.rb
+```ruby
+# app/models/user.rb
 class User < ActiveRecord::Base
   def self.group_by_days(days)
     sql = "SELECT "

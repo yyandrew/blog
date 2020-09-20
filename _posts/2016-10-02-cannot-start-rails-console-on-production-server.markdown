@@ -35,7 +35,7 @@ bundle exec rails -v # Rails 5.0.0.1
 
 难道是`.gitignore`文件设置了忽略了`bin`文件夹？一检查，果然有
 
-``` sh .gitignore
+``` sh
 log/*
 tmp/*
 config/database.yml
@@ -48,11 +48,14 @@ public/media/*
 
 没有什么好说的，先删掉`bin/*`行。
 接下来你也许还要检查一下你的`deploy.rb`文件`set :linked_dirs`是不是有`bin`的字样，如果有也请删除`bin`
-``` sh 有问题的deploy.rb设置
+
+* 有问题的deploy.rb设置
+``` sh
 set :linked_dirs, fetch(:linked_dirs, []).push('bin', 'log', 'tmp/pids', 'tmp/cache', 'tmp/sockets', 'vendor/bundle', 'public/system', 'public/assets', 'public/media')
 ```
 
-``` sh 修改后的deploy.rb设置
+* 修改后的deploy.rb设置
+``` sh
 set :linked_dirs, fetch(:linked_dirs, []).push('log', 'tmp/pids', 'tmp/cache', 'tmp/sockets', 'vendor/bundle', 'public/system', 'public/assets', 'public/media')
 ```
 

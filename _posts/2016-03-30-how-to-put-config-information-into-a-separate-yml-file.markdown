@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "怎么将公用的配置信息移动的单独的yml文件中"
+title: "将公用的配置信息移动到单独的yml文件中"
 date: 2016-03-30 18:48
 comments: true
 categories: "Rails"

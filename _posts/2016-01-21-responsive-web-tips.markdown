@@ -41,7 +41,7 @@ input[type="tex"]::-ms-clear {
 4.将4个block等宽，间距相等一行排列
   ![blocks](/images/four-blocks.png)
 
-``` html html
+``` html
 <div class="item-blocks">
   <div class="block">
     <div class="block1">This is block1</div>
@@ -58,7 +58,7 @@ input[type="tex"]::-ms-clear {
 </div>
 ```
 
-``` scss scss
+``` scss
 .item-blocks {
   margin: 0 -5px;
   .block {

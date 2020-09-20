@@ -10,7 +10,7 @@ categories: "JavaScript"
 
 在全局环境中this等价于`window`对象
 ```
-console.log(this == window) // 输出:true
+console.log(this === window) // 输出:true
 ```
 ## 存在于函数中的this
 
@@ -18,21 +18,25 @@ console.log(this == window) // 输出:true
 
 ``` javascript
 function this_in_func() {
-  console.log(this == window)
+  console.log(this === window)
 }
 
 this_in_func() // 输出:true.注意如果运行使用了`strict`模式，这时this为undefined
 ```
 
+## 一个函数或者对象的构造器
+
+当使用`new`关键字时，`this`为创建的这个对象。
 ``` javascript
 function Hero(heroName, realName) {
   this.heroName = heroName
   this.realName = realName
 }
 let supername = new Hero('Superman', 'Clark Kent')
-console.log(window.heroName == supername.heroName) // 输出:true
 ```
 
+上面的例子中`Hero`里面的`this`被绑定为`supername`.
+    
 ## 方法中的this
 
 当调用一个函数的时候，`this`相当于当前的调用者。比如下面例子中`dialogue`方法中的`this`就是`hero`
@@ -49,7 +53,7 @@ hero.dialogue() //输出:I am Batman
 
 ## call()和apply()中的this
 
-在`call()`和`apply()`中，`this`相当于接收者对象
+在`call()`和`apply()`中，`this`相当于接收者对象。
 ``` javascript
 function dialogue() {
   console.log(`I am ${this.heroName}`)
@@ -60,6 +64,8 @@ const hero = {
 dialogue.call(hero) // 输出:I am Batman
 dialogue.apply(hero) // 输出:I am Batman
 ```
+
+PS:`call`可以接受多少参数，然而`apply`只能接受两个参数。
 
 ## bind()和this
 

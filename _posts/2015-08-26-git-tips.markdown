@@ -46,8 +46,7 @@ git reset --hard HEAD@{1}
 git checkout HEAD~2 -- index.js
 ```
 
-* 怎么使用git bisect
-
+* 怎么使用[git bisect](https://www.metaltoad.com/blog/beginners-guide-git-bisect-process-elimination)
 ``` sh
 git bisect start # 开始一个bisect
 git bisect good good_commit_hash # 设置功能正常的提交的commit hash
@@ -55,8 +54,6 @@ git bisect bad bad_commit_hash # 设置功能不正常的提交的commit hash
 git bisect good/bad # 测试功能是不是正常，如果是正常的输入git bisect good，如果功能不正常输入git bisect bad，不断重复直到给出结果'137323c84ad24a81e8a351d70732af017d250d21 is the first bad commit'
 git bisect reset # 结束一个bisect
 ```
-
-[参考链接](https://www.metaltoad.com/blog/beginners-guide-git-bisect-process-elimination)
 
 * 批量修改历史提交(比如提交者的信息)
 ```
