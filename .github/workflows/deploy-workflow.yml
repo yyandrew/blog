@@ -2,7 +2,7 @@ name: Build and Deploy
 on:
   push:
     branches:
-      - blog_v2
+      - master
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
