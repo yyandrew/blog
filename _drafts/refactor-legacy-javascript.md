@@ -1,10 +1,8 @@
 ---
 layout: post
 title: 使用babel全家桶重构JavaScript遗留代码
-date: 2020-10-22 17:11 +0800
-categories: "JavaScript"
+categories: JavaScript
 ---
-
 ### 什么是遗留代码
 
 任何已经存在的、难以维护或者难以扩展的代码都是遗留代码。
