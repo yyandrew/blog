@@ -1,5 +1,5 @@
 ### 通过vagrant安装虚拟机
-
+下面所有的操作都会在这个虚拟机里执行。
 ```ruby
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
@@ -57,8 +57,8 @@ Vagrant.configure("2") do |config|
   #   vb.gui = true
   #
   #   # Customize the amount of memory on the VM:
-  #   vb.memory = "1024"
-    vb.cpus = 2
+    vb.memory = "2048" # kubernetes需要至少2GB内存
+    vb.cpus = 2 # kubernetes需要至少2核CPU
   end
   #
   # View the documentation for the provider you are using for more
@@ -99,7 +99,7 @@ EOF
 end
 ```
 
-### 启动并进入虚拟机
+### 启动，构建环境并进入虚拟机
 
 ```shell
 vagrant up
@@ -109,13 +109,17 @@ vagrant ssh
 
 ### 配置kuberadmin
 
+用来创建kubernetes集群的工具。
+
 ```shell
 kubeadm init
 sudo cp /etc/kubernetes/admin.conf $HOME/
 sudo chown $(id -u):$(id -g) $HOME/admin.conf
 ```
 
-3. 启动minikube
+### 启动minikube
+
+使用minikube，你可以在本地轻松的搭建好kubernetes环境。
 
 ```sh 
 sudo usermod -aG docker $USER && newgrp docker
@@ -167,13 +171,23 @@ spec:
         - containerPort: 80
 ```
 
-创建pods
+上面是Deployment示例。其中创建了一个ReplicaSet，负责启动2个Pods。除此之外，该例子还：
+
+1. 创建名为`my-nginx`（由.metadata.name指定）的Deployment
+2. 创建2个（由`spec.replicas`字段标明）Pod副本
+3. `selector`字段定义Deployment如何快速查找要管理的Pods。
+4. `template`p字段包含以下字段
+   1. Pod被使用`labels`字段打上`run: my-nginx`
+   2. Pod模板规约（即`template.spec`字段）指示Pods运行一个`nginx`容器。该容器运行最新版本的`nginx`Docker Hub镜像。
+   3. 创建一个容器并使用`name`字段将其命名为`my-nginx`。
+
+使用kubectl工具创建pods
 
 ```shell
 kubectl create -f my-nginx-rc.yaml
 ```
 
-将pods暴露出来
+使用kubectl工具将pods暴露出来
 
 ```sh 
 kubectl expose deployment/my-nginx --type=NodePort
@@ -222,7 +236,7 @@ Commercial support is available at
 </html>
 ```
 
-比上面的输出可以看出nginx已经正常工作了。
+从上面的输出可以看出nginx已经正常工作了。
 
 ### 其它命令
 
@@ -235,3 +249,6 @@ kubectl get pods,deployments,services
 kubectl describe service/my-nginx
 ```
 
+参考链接
+
+1. https://kubernetes.io/zh/docs/concepts/workloads/controllers/deployment/
