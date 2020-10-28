@@ -7,23 +7,33 @@ date: 2020-10-28 17:34 +0800
 通过这篇文章，希望各位读者能够掌握如下内容：
 
 1. 创建Dockerfile
-2. 创建Docker composer配置文件
-3. 使用Docker composer命令启动Rails服务
+2. 创建Docker compose配置文件
+3. 使用Docker compose命令启动Rails服务
+
+需要用到的工具：
+
+1. [docker](https://docs.docker.com/engine/install/)
+2. [docker compose](https://docs.docker.com/compose/install/)
+3. [asdf-vm](https://github.com/asdf-vm/asdf)
+4. [asdf-vm] ruby插件(https://github.com/asdf-vm/asdf-ruby)
 
 最终的效果是：
 
 1. 将ruby gem和npm package安装到一个容器，并在这个容器启动Rails服务器
-
 2. 在另外一个容器运行postgresql数据库。
 3. 通过宿主机的浏览器可以访问`http://localhost:3000`
-4. 在宿主机上修改文件之后，不用重新构建容器就能够在浏览器里查看修改
+4. 在宿主机上修改文件之后，不用重新构建容器就能够在浏览器里查看修改(不准确，应该是不需要重启Rasils服务的修改)。
+
+#### 安装ruby
+
+以后有时间再添加:dog:
 
 #### 创建一个新的Rails应用
 
 ```shell
 mkdir rails_with_docker
 cd rails_with_docker
-rails new . -d postgresql --skip-bundle --skip-webpack-install
+rails new . -d postgresql
 ```
 
 #### 创建Dockerfile
@@ -127,13 +137,14 @@ production:
   <<: *default
   database: rails_with_docker_production
 ````
-
+注意：配置文件里的**host**非常重要，它不是常见的localhost或者ip地址，这里它是一个docker compose服务**db**。
 #### 使用docker compose构建Rails应用所需的所有服务
 
 ```shell
 docker-compose build
 docker-compose run web rake db:create
 docker-compose run web rake db:migrate
+docker-compose run web rails webpacker:install
 docker-compose run web yarn install
 docker-compose up
 ```
