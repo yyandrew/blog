@@ -147,6 +147,7 @@ docker-compose run web rake db:create
 docker-compose run web rake db:migrate
 docker-compose run web rails webpacker:install
 docker-compose up
+docker-compose run web sh # 进入到web容器
 ```
 
 #### 使用浏览器测试
