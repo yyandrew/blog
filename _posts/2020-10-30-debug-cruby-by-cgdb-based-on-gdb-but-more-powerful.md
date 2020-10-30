@@ -24,7 +24,7 @@ category: Ruby
 一、安装编译依赖
 
 ```shell
-sudo apt install autoconf gcc  -y # build-essential automake make
+sudo apt install autoconf gcc automake -y # build-essential make libssl-dev
 sudo apt install cgdb -y
 ```
 
