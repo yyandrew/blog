@@ -15,7 +15,7 @@ date: 2020-10-28 17:34 +0800
 1. [docker](https://docs.docker.com/engine/install/)
 2. [docker compose](https://docs.docker.com/compose/install/)
 3. [asdf-vm](https://github.com/asdf-vm/asdf)
-4. [asdf-vm] ruby插件(https://github.com/asdf-vm/asdf-ruby)
+4. [asdf-vm ruby插件](https://github.com/asdf-vm/asdf-ruby)
 
 最终的效果是：
 
@@ -33,6 +33,7 @@ date: 2020-10-28 17:34 +0800
 ```shell
 mkdir rails_with_docker
 cd rails_with_docker
+# sudo apt install libpq-dev
 rails new . -d postgresql
 ```
 
@@ -78,7 +79,7 @@ RUN yarn install
 
 #### 创建docker-compose.yml
 
-在`rails_with_docker`根目录下创建一个新文件`docker-compose.yml`m内容如下：
+在`rails_with_docker`根目录下创建一个新文件`docker-compose.yml`内容如下：
 
 ```yaml
 version: '3'
@@ -145,7 +146,6 @@ docker-compose build
 docker-compose run web rake db:create
 docker-compose run web rake db:migrate
 docker-compose run web rails webpacker:install
-docker-compose run web yarn install
 docker-compose up
 ```
 
@@ -161,3 +161,4 @@ docker-compose up
 docker-compose down
 ```
 
+完整源码可以从[github](https://github.com/yyandrew/docker-demo/tree/rails-app-in-docker)找到。
