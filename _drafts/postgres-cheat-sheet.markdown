@@ -1,9 +1,8 @@
 ---
 layout: post
-title: "postgres小抄"
-date: 2016-04-08 11:14
+title: postgres小抄
 comments: true
-categories: "postgres"
+categories: postgres
 ---
 ## 常用操作
 

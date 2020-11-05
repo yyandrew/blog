@@ -12,10 +12,8 @@ date: 2020-10-28 17:34 +0800
 
 需要用到的工具：
 
-1. [docker](https://docs.docker.com/engine/install/)
-2. [docker compose](https://docs.docker.com/compose/install/)
-3. [asdf-vm](https://github.com/asdf-vm/asdf)
-4. [asdf-vm ruby插件](https://github.com/asdf-vm/asdf-ruby)
+1. [Docker](https://docs.docker.com/engine/install/)
+2. [Docker Compose](https://docs.docker.com/compose/install/)
 
 最终的效果是：
 
@@ -27,14 +25,18 @@ date: 2020-10-28 17:34 +0800
 #### 安装ruby
 
 以后有时间再添加:dog:
+#### 构建一个Dockerfile用来创建rails镜像
+```
+FROM ruby:2.7.1
+RUN gem install rails
+```
+执行`docker build -t rails6 .`开始构建名字为`rails6`的镜像。构建好这个镜像之后，我们甚至都不用在宿主机上安装Rails这个gem，我们可以直接通过这个镜像创建一个新的Rails应用。
 
-#### 创建一个新的Rails应用
+#### 创建一个刚刚创建的Rails6镜像创建一个新的Rails应用
 
 ```shell
-mkdir rails_with_docker
-cd rails_with_docker
-# sudo apt install libpq-dev
-rails new . -d postgresql
+docker run -it --rm --user "$(id -u):$(id -g)" -v "$PWD":/usr/src/app -w /usr/src/app \
+  rails6 rails new --skip-bundle -d postgresql rails_with_docker
 ```
 
 #### 创建Dockerfile
@@ -55,6 +57,14 @@ RUN apt-get update && apt-get install -y \
   echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list && \
   apt-get update && apt-get install -y nodejs yarn
 
+# 使用tmp缓存gems
+# 准备Gemfile文件
+COPY Gemfile* /tmp/
+# 安装bundler及gems
+WORKDIR /tmp
+RUN gem update bundler
+RUN bundle install --jobs 5
+
 # 创建一个项目目录
 RUN mkdir /app
 # 设置工作目录，设置好了之后就不用每次执行下面的拷贝文件命令之前都要cd到这个目录
@@ -63,16 +73,9 @@ WORKDIR /app
 # 暴露3000端口
 EXPOSE 3000
 
-# 准备Gemfile文件
-COPY Gemfile .
-COPY Gemfile.lock .
-# 安装bundler及gems
-RUN gem update bundler
-RUN bundle install --jobs 5
-
 # 将package.json及yarn.lock拷贝到docker的工作目录
 COPY package.json .
-COPY yarn.lock .
+# COPY yarn.lock .
 # 安装npm packages
 RUN yarn install
 ```
