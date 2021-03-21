@@ -12,7 +12,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Deploy Jekyll Site
-        uses: yyandrew/github-pages-deploy-action-for-jekyll@v1
+        uses: yyandrew/github-pages-deploy-action-for-jekyll@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ${{ secrets.GITHUB_REPOSITORY }}
