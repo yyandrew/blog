@@ -192,7 +192,7 @@ iptables -A INPUT -p tcp -m tcp --dport 443 -j ACCEPT
 Options:
 ```
 # 备份所有的数据库
-su - postgres -c 'mkdir /tmp/pg_backup; pg_dumpall > /tmp/pg_backup/^Cdumpall-$(date '+%F').sql'
+su - postgres -c 'mkdir /tmp/pg_backup; pg_dumpall > /tmp/pg_backup/dumpall-$(date '+%F').sql'
 # 导入所有数据库
 psql -f  pgdumpall-2018-11-20.sql postgres
 ```
