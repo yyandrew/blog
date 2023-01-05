@@ -4,7 +4,7 @@ title: 项目列表
 ---
 ### copyme
 
-用途：保存剪切板历史记录  
+用途：保存剪切板历史记录
 
 技术栈：Electron, React
 
@@ -19,6 +19,6 @@ title: 项目列表
 
 功能要点：新增卡片及任务，拖拽卡片及任务
 
-演示地址：[trello.jsonlab.stream](https://trello.jsonlab.stream)
+演示地址：[trello.ky2020.click](https://trello.ky2020.click)
 
 ![trello](./images/trello.png)
