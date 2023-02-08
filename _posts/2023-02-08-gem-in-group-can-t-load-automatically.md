@@ -17,7 +17,7 @@ end
 
 ### 排查过程
 1. 运行`rails console`进入到`irb`环境，使用`$LOAD_PATH.find {|path| path.match /pry/}`看看`$LOAD_PATHS`是否包含`pry`，结果是`nil`表示`pry`没有自动加载;
-2. 退出`rails console`环境到shell，运行`bundle show pry`，结果提示没有安装`pry`, 可我明明把`pry`加到了`development`和`test`组了啊![bundle-show-pry.png](/images/bundle-show-pry.png)；
+2. 退出`rails console`环境到shell，运行`bundle show pry`，结果提示没有安装`pry`, 可我明明把`pry`加到了`development`和`test`组了啊；![bundle-show-pry.png](/images/bundle-show-pry.png)
 
 {:start="3"}
 3. 百思不得其解，只能上网搜结果了，最后找到[是因为项目目录下包含`.bundle/config`的`BUNDLE_WITHOUT`配置导致的](https://stackoverflow.com/a/26993819)，下面是我的项目的`.bundle/config`内容![content-of-bundle-config.png](/images/content-of-bundle-config.png)
