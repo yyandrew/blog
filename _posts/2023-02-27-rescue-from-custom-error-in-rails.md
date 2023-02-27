@@ -1,7 +1,17 @@
 ---
 layout: post
 title: Rails 捕获自定义的异常
+date: 2023-02-27 15:39 +0800
 ---
+如果你的项目能够在一处代码捕获任意地方的异常是的话是不是一件非常酷的一件事件？
+下面就看看怎么在 Rails 项目中实现这种的功能。
+
+需要使用的的 API：
+* [raise](https://apidock.com/ruby/Kernel/raise)
+* [rescue_from](https://apidock.com/rails/ActiveSupport/Rescuable/ClassMethods/rescue_from)
+
+通过下面两步可以实现本文的全局捕获异常的功能：
+
 1. 在项目中新建一个文件`app/controllers/concerns/error_handlable.rb`，内容如下
 ```ruby
 module ErrorHandlable
@@ -40,5 +50,4 @@ class FooController < ApplicationController
 end
 ```
 
-参考链接：
-1. [rescue_from文档](https://apidock.com/rails/ActiveSupport/Rescuable/ClassMethods/rescue_from)
+访问`http://localhost:3000/foos`就可以触发异常->捕获异常->渲染定制内容
