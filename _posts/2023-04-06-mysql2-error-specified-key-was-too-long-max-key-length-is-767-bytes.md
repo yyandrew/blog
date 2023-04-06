@@ -1,6 +1,6 @@
 ---
 layout: post
-title: 'Mysql2::Error: Specified key was too long; max key length is 767 bytes'问题修复
+title: "Mysql2::Error: Specified key was too long; max key length is 767 bytes" 问题修复
 date: 2023-04-06 17:07 +0800
 ---
 
