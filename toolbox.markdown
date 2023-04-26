@@ -18,3 +18,4 @@ footer: true
 | [Raindrop.io](https://raindrop.io/) | 书签管理工具 | 免费/￥215 |
 | [pgcli](https://www.pgcli.com/)| Postgres命令行增强工具 | 免费 |
 | [asdf-vm](https://github.com/asdf-vm/asdf)| 编程语言版本管理工具 | 免费 |
+| [trash-cli](https://pypi.org/project/trash-cli/)| 防止误删文件 | 免费 |
