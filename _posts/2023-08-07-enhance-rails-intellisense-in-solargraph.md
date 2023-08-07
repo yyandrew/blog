@@ -23,6 +23,7 @@ solargraph download-core
 ### 生成 Rails 文档
 运行下面命令为当前 Rails 项目的各个插件生成文档
 ```
+bundle add yard # 将 yard 插件添加项目的 Gemfile 文件
 bundle exec yard gems
 ```
 ### 添加配置文件使用 Neovim 提示文档
