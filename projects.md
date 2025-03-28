@@ -19,6 +19,6 @@ title: 项目列表
 
 功能要点：新增卡片及任务，拖拽卡片及任务
 
-演示地址：[trello.ky2020.click](https://trello.ky2020.click)
+演示地址：[trello.ky2020.store](https://trello.ky2020.store)
 
 ![trello](./images/trello.png)
