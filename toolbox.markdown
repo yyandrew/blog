@@ -19,4 +19,4 @@ footer: true
 | [asdf-vm](https://github.com/asdf-vm/asdf)| 编程语言版本管理工具 | 免费 |
 | [trash-cli](https://pypi.org/project/trash-cli/)| 防止误删文件 | 免费 |
 | [AppClean](https://freemacsoft.net/appcleaner/)| 应用卸载工具 | 免费 |
-| [Lazygit](https://github.com/jesseduffield/lazygit)| 应用卸载工具 | 免费 |
+| [Lazygit](https://github.com/jesseduffield/lazygit)| git命令行管理工具 | 免费 |
