@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>highchart小抄 | Andrew’s Blog</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="highchart小抄" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="1.设置y轴只显示整数" />
+<meta property="og:description" content="1.设置y轴只显示整数" />
+<link rel="canonical" href="https://blog.ky2020.store/javascript/2016/06/12/highchart-cheat-sheet.html" />
+<meta property="og:url" content="https://blog.ky2020.store/javascript/2016/06/12/highchart-cheat-sheet.html" />
+<meta property="og:site_name" content="Andrew’s Blog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2016-06-12T09:51:52+00:00" />
+<script type="application/ld+json">
+{"description":"1.设置y轴只显示整数","headline":"highchart小抄","dateModified":"2016-06-12T09:51:52+00:00","url":"https://blog.ky2020.store/javascript/2016/06/12/highchart-cheat-sheet.html","datePublished":"2016-06-12T09:51:52+00:00","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://blog.ky2020.store/javascript/2016/06/12/highchart-cheat-sheet.html"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://blog.ky2020.store/feed.xml" title="Andrew's Blog" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Andrew&#39;s Blog</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about.html">关于我</a><a class="page-link" href="/projects.html">项目列表</a><a class="page-link" href="/toolbox.html">工具箱</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">highchart小抄</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2016-06-12T09:51:52+00:00" itemprop="datePublished">Jun 12, 2016
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p>1.设置y轴只显示整数</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">yAxis</span><span class="p">:</span> <span class="p">{</span>
+  <span class="nl">allowDecimals</span><span class="p">:</span> <span class="kc">false</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>2.去掉导出按钮和水印</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">exporting</span><span class="p">:</span> <span class="p">{</span>
+  <span class="nl">enabled</span><span class="p">:</span> <span class="kc">false</span> <span class="err">#</span><span class="nx">去掉导出按钮</span>
+<span class="p">},</span>
+<span class="nx">credits</span><span class="p">:</span> <span class="p">{</span>
+  <span class="nl">enabled</span><span class="p">:</span> <span class="kc">false</span> <span class="err">#</span><span class="nx">去掉</span><span class="dl">'</span><span class="s1">Highcharts.com</span><span class="dl">'</span><span class="nx">水印</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>3.设置tooltip超过图表部分的内容总是显示</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">tooltip</span><span class="p">:</span> <span class="p">{</span>
+  <span class="nl">useHTML</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+  <span class="nx">formatter</span><span class="p">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="dl">'</span><span class="s1">&lt;div class="tooltip-of-chart"&gt;</span><span class="dl">'</span><span class="o">+</span><span class="k">this</span><span class="p">.</span><span class="nx">y</span> <span class="o">+</span> <span class="dl">'</span><span class="s1">&lt;/div&gt;Total Companies on </span><span class="dl">'</span> <span class="o">+</span> <span class="nx">Highcharts</span><span class="p">.</span><span class="nx">dateFormat</span><span class="p">(</span><span class="dl">"</span><span class="s2">%b %d, %Y</span><span class="dl">"</span><span class="p">,</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">x</span><span class="p">))</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<pre><code class="language-CSS">.highcharts-container { overflow: visible !important;  }
+.highcharts-container svg {
+    overflow: visible !important;
+}
+</code></pre>
+
+<p>4.在tooltip和pointer之间划一条虚线</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">tooltip</span><span class="p">:</span> <span class="p">{</span>
+  <span class="nl">useHTML</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+  <span class="nx">borderRadius</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+  <span class="nx">formatter</span><span class="p">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="dl">'</span><span class="s1">&lt;div class="tooltip-of-chart"&gt;</span><span class="dl">'</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">y</span> <span class="o">+</span> <span class="dl">'</span><span class="s1">&lt;/div&gt;</span><span class="dl">'</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">x</span><span class="p">;</span>
+  <span class="p">},</span>
+  <span class="nx">positioner</span><span class="p">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">labelWidth</span><span class="p">,</span> <span class="nx">labelHeight</span><span class="p">,</span> <span class="nx">point</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">{</span>
+      <span class="na">x</span><span class="p">:</span> <span class="nx">point</span><span class="p">.</span><span class="nx">plotX</span> <span class="o">+</span> <span class="nx">barChart</span><span class="p">.</span><span class="nx">plotLeft</span> <span class="o">-</span> <span class="mi">80</span><span class="p">,</span>
+      <span class="na">y</span><span class="p">:</span> <span class="nx">point</span><span class="p">.</span><span class="nx">plotY</span> <span class="o">+</span> <span class="nx">barChart</span><span class="p">.</span><span class="nx">plotTop</span> <span class="o">-</span> <span class="mi">182</span>
+    <span class="p">};</span>
+  <span class="p">},</span>
+  <span class="nx">borderColor</span><span class="p">:</span> <span class="dl">"</span><span class="s2">#979797</span><span class="dl">"</span>
+<span class="p">}</span>
+<span class="nl">plotOptions</span><span class="p">:</span> <span class="p">{</span>
+  <span class="na">series</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">point</span><span class="p">:</span> <span class="p">{</span>
+      <span class="na">events</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">mouseOver</span><span class="p">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+          <span class="kd">var</span> <span class="nx">xPosition</span><span class="p">,</span> <span class="nx">yPosition</span><span class="p">;</span>
+          <span class="kd">var</span> <span class="nx">barChart</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">chart</span>
+          <span class="nx">xPosition</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">plotX</span> <span class="o">+</span> <span class="nx">barChart</span><span class="p">.</span><span class="nx">plotLeft</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
+          <span class="nx">yPosition</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">plotY</span> <span class="o">+</span> <span class="nx">barChart</span><span class="p">.</span><span class="nx">plotTop</span><span class="p">;</span>
+          <span class="nx">barChart</span><span class="p">.</span><span class="nx">dotLine</span> <span class="o">=</span> <span class="nx">barChart</span><span class="p">.</span><span class="nx">renderer</span><span class="p">.</span><span class="nx">path</span><span class="p">([</span><span class="dl">'</span><span class="s1">M</span><span class="dl">'</span><span class="p">,</span> <span class="nx">xPosition</span><span class="p">,</span> <span class="nx">yPosition</span> <span class="o">-</span> <span class="mi">4</span><span class="p">,</span> <span class="dl">'</span><span class="s1">L</span><span class="dl">'</span><span class="p">,</span> <span class="nx">xPosition</span><span class="p">,</span> <span class="nx">yPosition</span> <span class="o">-</span> <span class="mi">71</span><span class="p">]).</span><span class="nx">attr</span><span class="p">({</span>
+            <span class="dl">"</span><span class="s2">stroke-width</span><span class="dl">"</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+            <span class="na">stroke</span><span class="p">:</span> <span class="dl">"</span><span class="s2">#CCCCCC</span><span class="dl">"</span><span class="p">,</span>
+            <span class="na">dashstyle</span><span class="p">:</span> <span class="dl">"</span><span class="s2">ShortDash</span><span class="dl">"</span>
+          <span class="p">}).</span><span class="nx">add</span><span class="p">();</span>
+          <span class="k">return</span> <span class="nx">barChart</span><span class="p">.</span><span class="nx">dotLine</span><span class="p">.</span><span class="nx">show</span><span class="p">();</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="na">events</span><span class="p">:</span> <span class="p">{</span>
+      <span class="na">mouseOut</span><span class="p">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">barChart</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">chart</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">barChart</span><span class="p">.</span><span class="nx">dotLine</span><span class="p">)</span> <span class="p">{</span>
+          <span class="k">return</span> <span class="nx">barChart</span><span class="p">.</span><span class="nx">dotLine</span><span class="p">.</span><span class="nx">element</span><span class="p">.</span><span class="nx">remove</span><span class="p">();</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>5.保持y轴始终在图表的底部</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">yAxis</span><span class="p">:</span> <span class="p">{</span>
+  <span class="nl">minRange</span><span class="p">:</span> <span class="mf">0.1</span>
+<span class="p">}</span>
+<span class="err">#</span> <span class="nx">如果是line图表还要添加下面代码</span>
+<span class="nx">plotOptions</span><span class="p">:</span> <span class="p">{</span>
+  <span class="nl">line</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">softThreshold</span><span class="p">:</span> <span class="kc">false</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+  </div><a class="u-url" href="/javascript/2016/06/12/highchart-cheat-sheet.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Andrew&#39;s Blog</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Andrew&#39;s Blog</li><li><a class="u-email" href="mailto:zzcv20051122@126.com">zzcv20051122@126.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/yyandrew"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">yyandrew</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>A Rubyist&#39;s Blog.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

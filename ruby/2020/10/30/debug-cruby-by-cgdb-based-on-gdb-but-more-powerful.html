@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>使用cgdb调试CRuby的C源码 | Andrew’s Blog</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="使用cgdb调试CRuby的C源码" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="从这篇文章可以学到：" />
+<meta property="og:description" content="从这篇文章可以学到：" />
+<link rel="canonical" href="https://blog.ky2020.store/ruby/2020/10/30/debug-cruby-by-cgdb-based-on-gdb-but-more-powerful.html" />
+<meta property="og:url" content="https://blog.ky2020.store/ruby/2020/10/30/debug-cruby-by-cgdb-based-on-gdb-but-more-powerful.html" />
+<meta property="og:site_name" content="Andrew’s Blog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-10-30T02:49:00+00:00" />
+<script type="application/ld+json">
+{"description":"从这篇文章可以学到：","headline":"使用cgdb调试CRuby的C源码","dateModified":"2020-10-30T02:49:00+00:00","url":"https://blog.ky2020.store/ruby/2020/10/30/debug-cruby-by-cgdb-based-on-gdb-but-more-powerful.html","datePublished":"2020-10-30T02:49:00+00:00","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://blog.ky2020.store/ruby/2020/10/30/debug-cruby-by-cgdb-based-on-gdb-but-more-powerful.html"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://blog.ky2020.store/feed.xml" title="Andrew's Blog" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper">
+<a class="site-title" rel="author" href="/">Andrew's Blog</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger">
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewbox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"></path>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger">
+<a class="page-link" href="/about.html">关于我</a><a class="page-link" href="/projects.html">项目列表</a><a class="page-link" href="/toolbox.html">工具箱</a>
+</div>
+      </nav>
+</div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">使用cgdb调试CRuby的C源码</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2020-10-30T02:49:00+00:00" itemprop="datePublished">Oct 30, 2020
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p>从这篇文章可以学到：</p>
+
+<ol>
+  <li>怎么使用cgdb(对GNU gdb进行封装，提供一些加强功能)调试C/C++源码</li>
+  <li>使用cgdb深入到CRuby源码</li>
+  <li>从源码编译安装CRuby</li>
+</ol>
+
+<h3 id="cgdb介绍">cgdb介绍</h3>
+
+<p>调试工具是代码分析中至关重要的工具之一。在使用vim+ctags查看代码时，经常会遇到难以理解的部分，此时，可以借助调试工具，对代码的运行时时行跟踪，通过跟踪运行过程及关键数据的变化，可以从程序执行的过程中理解源代码的功能。</p>
+
+<p>调试C/C++源码的工具有很多种，最常用的是GNU gdb工具。但是个人感觉它不太酷。cgdb对GNU gdb进行了封装，它提供了一些方便地实时查看源代码等其他很有特色的功能，其官网地址为<a href="https://cgdb.github.io/">https://cgdb.github.io/</a>。它的界面如下图所示：</p>
+
+<p><img src="/images/screenshot-debugging-with-cgdb.png" alt="screenshot-debugging-with-cgdb.png"></p>
+
+<h3 id="编译安装cruby">编译安装CRuby</h3>
+
+<p>一、安装编译依赖</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>apt <span class="nb">install </span>autoconf gcc automake <span class="nt">-y</span> <span class="c"># build-essential make libssl-dev</span>
+<span class="nb">sudo </span>apt <span class="nb">install </span>cgdb <span class="nt">-y</span>
+</code></pre></div></div>
+
+<p>二、编译并安装CRuby</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>wget https://cache.ruby-lang.org/pub/ruby/2.7/ruby-2.7.2.tar.gz
+<span class="nb">tar </span>xf ruby-2.7.2.tar.gz
+<span class="nb">cd </span>ruby-2.7.2
+autoconf
+./configure
+make <span class="nt">-j8</span>
+<span class="nb">sudo </span>make <span class="nb">install</span>
+</code></pre></div></div>
+
+<h3 id="使用cgdb调试cruby">使用cgdb调试CRuby</h3>
+
+<p>一、先确定要调试哪个ruby API。比如我们想要调试<code class="language-plaintext highlighter-rouge">String#split</code>这个API。</p>
+
+<p>从<a href="https://apidock.com/ruby/String/split">API文档</a>来看，它是在<code class="language-plaintext highlighter-rouge">rb_str_split_m</code>函数里实现了这个功能。</p>
+
+<p>二、使用cgdb调试<code class="language-plaintext highlighter-rouge">rb_str_split_m</code>函数</p>
+
+<ul>
+  <li>创建一个tes.rb文件，里面只有一句ruby代码，用来触发<code class="language-plaintext highlighter-rouge">rb_str_split_m</code>函数。代码如下：</li>
+</ul>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># test.rb</span>
+<span class="nb">puts</span> <span class="s1">'andrew yang'</span><span class="p">.</span><span class="nf">split</span>
+</code></pre></div></div>
+
+<ul>
+  <li>进入cgdb</li>
+</ul>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>cgdb <span class="sb">`</span>which ruby<span class="sb">`</span>
+</code></pre></div></div>
+
+<p>你会看到下面的这个界面</p>
+
+<p><img src="/images/start-cgdb.png" alt="start-cgdb.png"></p>
+
+<ul>
+  <li>在cgdb里查找函数<code class="language-plaintext highlighter-rouge">rb_str_split_m</code>
+</li>
+</ul>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">(</span>gdb<span class="o">)</span> info fun rb_str_split_m
+All functions matching regular expression <span class="s2">"rb_str_split_m"</span>:
+
+File string.c:
+static VALUE rb_str_split_m<span class="o">(</span>int, VALUE <span class="k">*</span>, VALUE<span class="o">)</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">info fun</code>是GNU gdb提供的一个查找函数的命令。其格式为<code class="language-plaintext highlighter-rouge">info fun function_name</code></p>
+
+<p>从上面的输出可以看出这个函数在<code class="language-plaintext highlighter-rouge">string.c</code>被定义的。找到定义的地方之后我们就知道断点应该下在什么地方了。</p>
+
+<ul>
+  <li>在cgdb里下断点</li>
+</ul>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">(</span>gdb<span class="o">)</span> <span class="nb">break </span>string.c:rb_str_split_m
+Breakpoint 1 at 0x1904d0: file string.c, line 7896.
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">break</code>是GNU gdb提供的下断点的命令。格式比较丰富，这里我们使用`break 文件名:函数名的格式添加了一个断点。更多格式请查看<a href="https://ftp.gnu.org/old-gnu/Manuals/gdb/html_node/gdb_28.html">gdb文档</a></p>
+
+<ul>
+  <li>在cgdb运行ruby代码(之前创建的test.rb文件)</li>
+</ul>
+
+<pre><code class="language-shell ">(gdb) run ./test.rb
+Starting program: /usr/local/bin/ruby ./test.rb
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
+
+Breakpoint 1, rb_str_split_m (argc=1, argv=0x7ffff7ee7350, str=93824998455240) at string.c:7896
+</code></pre>
+
+<p>从下图可以看出cgdb执行到断点处自动停止了，并且它帮我们自动定位到源码了（红框里的红色的字7896）。</p>
+
+<p><img src="/images/stop-at-breakpoint-in-cgdb.png" alt="stop-at-breakpoint-in-cgdb.png"></p>
+
+<p>现在你就可以开始查看这个函数运行时的各种状态了。比如我们想查看<code class="language-plaintext highlighter-rouge">result</code>p这个变量的值，可以使用<code class="language-plaintext highlighter-rouge">display resut</code>命令</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">(</span>gdb<span class="o">)</span> n
+<span class="o">(</span>gdb<span class="o">)</span> n
+<span class="o">(</span>gdb<span class="o">)</span> display result
+1: result <span class="o">=</span> 8
+</code></pre></div></div>
+
+<h3 id="总结">总结</h3>
+
+<p>文章到此就结束了。本文主要使用cgdb来跟踪ruby的运行过程，因此我们事先编译了CRuby源代码，生成可执行程序ruby，利用cgdb对ruby程序的运行进行了跟踪。掌握了cgdb调试C源码的方法之后你就可以开始为ruby修bug了。</p>
+
+<h3 id="其它有用的命令">其它有用的命令：</h3>
+
+<p><img class="emoji" title=":point_right:" alt=":point_right:" src="https://github.githubassets.com/images/icons/emoji/unicode/1f449.png" height="20" width="20"><code class="language-plaintext highlighter-rouge">display</code>: 查看变量的值。比如要查看变量<code class="language-plaintext highlighter-rouge">x</code>的值，可以使用<code class="language-plaintext highlighter-rouge">display x</code></p>
+
+<p><img class="emoji" title=":point_right:" alt=":point_right:" src="https://github.githubassets.com/images/icons/emoji/unicode/1f449.png" height="20" width="20">step: 单步跟踪，进入被调用的函数</p>
+
+<p><img class="emoji" title=":point_right:" alt=":point_right:" src="https://github.githubassets.com/images/icons/emoji/unicode/1f449.png" height="20" width="20">next: 单步跟踪，跳过被调用的函数</p>
+
+<p><img class="emoji" title=":point_right:" alt=":point_right:" src="https://github.githubassets.com/images/icons/emoji/unicode/1f449.png" height="20" width="20">backtrace: 显示函数调用栈</p>
+
+<p><img class="emoji" title=":point_right:" alt=":point_right:" src="https://github.githubassets.com/images/icons/emoji/unicode/1f449.png" height="20" width="20">continue: 继续执行到下一个断点。如果没有断点则结束程序。</p>
+
+<p><img class="emoji" title=":point_right:" alt=":point_right:" src="https://github.githubassets.com/images/icons/emoji/unicode/1f449.png" height="20" width="20">delete: 删除一个断点。格式略多，使用方法可以查看<a href="https://ftp.gnu.org/old-gnu/Manuals/gdb/html_node/gdb_31.html">官方文档</a></p>
+
+<p><img class="emoji" title=":point_right:" alt=":point_right:" src="https://github.githubassets.com/images/icons/emoji/unicode/1f449.png" height="20" width="20">watch: 监视一个表达式。表达式的值发生变化就中断。比如你想监视<code class="language-plaintext highlighter-rouge">x</code>可以使用<code class="language-plaintext highlighter-rouge">watch x</code>，之后如果<code class="language-plaintext highlighter-rouge">x</code>的值发生变化，程序会被中断。</p>
+
+<p><img class="emoji" title=":point_right:" alt=":point_right:" src="https://github.githubassets.com/images/icons/emoji/unicode/1f449.png" height="20" width="20">ctrl+D：退出cgdb</p>
+
+<h3 id="参考链接">参考链接：</h3>
+
+<ol>
+  <li><a href="https://sourceware.org/gdb/current/onlinedocs/gdb/">https://sourceware.org/gdb/current/onlinedocs/gdb/</a></li>
+  <li><a href="https://apidock.com/ruby">https://apidock.com/ruby</a></li>
+  <li><a href="https://github.com/ruby/ruby#how-to-compile-and-install">https://github.com/ruby/ruby#how-to-compile-and-install</a></li>
+</ol>
+
+
+  </div>
+<a class="u-url" href="/ruby/2020/10/30/debug-cruby-by-cgdb-based-on-gdb-but-more-powerful.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Andrew's Blog</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Andrew's Blog</li>
+<li><a class="u-email" href="mailto:zzcv20051122@126.com">zzcv20051122@126.com</a></li>
+</ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+<ul class="social-media-list"><li><a href="https://github.com/yyandrew"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">yyandrew</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>A Rubyist's Blog.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>为Rails API添加文档的一次尝试 | Andrew’s Blog</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="为Rails API添加文档的一次尝试" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="TL;DR" />
+<meta property="og:description" content="TL;DR" />
+<link rel="canonical" href="https://blog.ky2020.store/2020/09/23/how-to-generate-api-doc-for-rails-api.html" />
+<meta property="og:url" content="https://blog.ky2020.store/2020/09/23/how-to-generate-api-doc-for-rails-api.html" />
+<meta property="og:site_name" content="Andrew’s Blog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-09-23T02:35:00+00:00" />
+<script type="application/ld+json">
+{"description":"TL;DR","headline":"为Rails API添加文档的一次尝试","dateModified":"2020-09-23T02:35:00+00:00","url":"https://blog.ky2020.store/2020/09/23/how-to-generate-api-doc-for-rails-api.html","datePublished":"2020-09-23T02:35:00+00:00","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://blog.ky2020.store/2020/09/23/how-to-generate-api-doc-for-rails-api.html"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://blog.ky2020.store/feed.xml" title="Andrew's Blog" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Andrew&#39;s Blog</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about.html">关于我</a><a class="page-link" href="/projects.html">项目列表</a><a class="page-link" href="/toolbox.html">工具箱</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">为Rails API添加文档的一次尝试</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2020-09-23T02:35:00+00:00" itemprop="datePublished">Sep 23, 2020
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <h2 id="tldr">TL;DR</h2>
+
+<p>使用<code class="language-plaintext highlighter-rouge">apipie-rails</code>生成json格式的文件，<code class="language-plaintext highlighter-rouge">rswag-ui</code>使用这个json文件，通过经典的swagger ui界面展示API文档。</p>
+
+<h2 id="具体步骤">具体步骤</h2>
+
+<ol>
+  <li>
+    <p>安装 Gem</p>
+
+    <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>gem <span class="s1">'rswag-ui'</span>
+gem <span class="s1">'apipie-rails'</span>
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>修改controller文件，添加一个endpoint文档说明</p>
+
+    <div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Api</span>
+  <span class="k">module</span> <span class="nn">V1</span>
+    <span class="k">module</span> <span class="nn">Users</span>
+      <span class="k">class</span> <span class="nc">SessionsController</span> <span class="o">&lt;</span> <span class="no">Devise</span><span class="o">::</span><span class="no">SessionsController</span>
+        <span class="n">api</span> <span class="ss">:DELETE</span><span class="p">,</span> <span class="s1">'/users/sign-out'</span><span class="p">,</span> <span class="s1">'Sign out'</span>
+        <span class="k">def</span> <span class="nf">destroy</span>
+          <span class="n">sign_out</span><span class="p">(</span><span class="ss">:user</span><span class="p">)</span>
+          <span class="n">head</span> <span class="ss">:no_content</span>
+        <span class="k">end</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>生成swagger json</p>
+
+    <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>rake apipie:static_swagger_json
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>设置swagger-ui使用json</p>
+
+    <ol>
+      <li>
+        <p>为rswag-ui生成配置文件</p>
+
+        <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>rails g rswag:ui:install
+</code></pre></div>        </div>
+      </li>
+      <li>
+        <p>修改<code class="language-plaintext highlighter-rouge">config/initializers/rswag-ui.rb</code>使它能够使用<code class="language-plaintext highlighter-rouge">apipie</code>生成的json文件</p>
+
+        <div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="no">Rswag</span><span class="o">::</span><span class="no">Ui</span><span class="p">.</span><span class="nf">configure</span> <span class="k">do</span> <span class="o">|</span><span class="n">c</span><span class="o">|</span>
+	<span class="o">...</span>
+	<span class="n">c</span><span class="p">.</span><span class="nf">swagger_endpoint</span> <span class="s1">'/doc/apidoc/schema_swagger_form_data.json'</span><span class="p">,</span> <span class="s1">'API V1 Docs'</span> 
+	<span class="o">...</span>
+<span class="k">end</span>
+</code></pre></div>        </div>
+      </li>
+    </ol>
+
+    <p>最终的效果图</p>
+
+    <p><img src="/images/swagger-with-apipie.png" alt="swagger-with-apipie.png" /></p>
+  </li>
+</ol>
+
+<h2 id="定制swaggerui">定制SwaggerUi</h2>
+
+<p>如果我想禁止页面上的<code class="language-plaintext highlighter-rouge">Try it out!</code>的功能，应该怎么做呢？这时候就需要修改<code class="language-plaintext highlighter-rouge">swagger-ui的html源文件了</code>。</p>
+
+<p>通过<a href="https://github.com/swagger-api/swagger-ui/tree/2.x">swagger-ui</a>的官方文档可以找到需要设置一下<code class="language-plaintext highlighter-rouge">supportedSubmitMethods</code>。要在哪里设置呢？你可能已经猜到需要修改html源文件(上面已经提到)。</p>
+
+<ol>
+  <li>
+    <p>通过<a href="https://github.com/rswag/rswag#customizing-the-swagger-ui">rswag</a>命令(需要安装<a href="https://github.com/rswag/rswag">rswag</a> gem)行生成html源文件</p>
+
+    <pre><code class="language-shell ">$ rails g rswag:ui:custom
+Running via Spring preloader in process 77177
+      create  app/views/rswag/ui/home/index.html.erb
+</code></pre>
+  </li>
+  <li>
+    <p>将<code class="language-plaintext highlighter-rouge">supportedSubmitMethods</code>添加到<code class="language-plaintext highlighter-rouge">configObject</code></p>
+
+    <pre><code class="language-javascript ">&lt;script&gt;
+  window.onload = function () {
+    var configObject = JSON.parse('&lt;%= config_object.to_json %&gt;');
+    var oauthConfigObject = JSON.parse('&lt;%= oauth_config_object.to_json %&gt;');
+   
+    // Apply mandatory parameters
+    ... // 省略中间不重要的代码
+    configObject.supportedSubmitMethods = []; // []表示禁止所有action的Try it out
+   
+    ... // 省略中间不重要的代码
+    const ui = SwaggerUIBundle(configObject);
+   
+    // Apply OAuth config
+    ui.initOAuth(oauthConfigObject);
+  }
+&lt;/script&gt;
+   
+</code></pre>
+
+    <p>从下面的截图可以看出<code class="language-plaintext highlighter-rouge">Try it out</code>按钮已经消失了。</p>
+
+    <p><img src="/images/disable-try-it-out.png" alt="disable-try-it-out.png" /></p>
+  </li>
+</ol>
+
+  </div><a class="u-url" href="/2020/09/23/how-to-generate-api-doc-for-rails-api.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Andrew&#39;s Blog</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Andrew&#39;s Blog</li><li><a class="u-email" href="mailto:zzcv20051122@126.com">zzcv20051122@126.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/yyandrew"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">yyandrew</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>A Rubyist&#39;s Blog.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

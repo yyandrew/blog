@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>使用useEffect 钩子实现防抖效果 | Andrew’s Blog</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="使用useEffect 钩子实现防抖效果" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="什么是防抖 防抖又称为函数防抖，它是指对于在事件被触发n秒后再执行的回调，如果在这n秒内又重新被触发，则重新开始计时，是常见的优化方法。" />
+<meta property="og:description" content="什么是防抖 防抖又称为函数防抖，它是指对于在事件被触发n秒后再执行的回调，如果在这n秒内又重新被触发，则重新开始计时，是常见的优化方法。" />
+<link rel="canonical" href="https://blog.ky2020.store/2021/06/07/debounce-with-use-effect-in-react.html" />
+<meta property="og:url" content="https://blog.ky2020.store/2021/06/07/debounce-with-use-effect-in-react.html" />
+<meta property="og:site_name" content="Andrew’s Blog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-06-07T09:56:00+00:00" />
+<script type="application/ld+json">
+{"description":"什么是防抖 防抖又称为函数防抖，它是指对于在事件被触发n秒后再执行的回调，如果在这n秒内又重新被触发，则重新开始计时，是常见的优化方法。","headline":"使用useEffect 钩子实现防抖效果","dateModified":"2021-06-07T09:56:00+00:00","url":"https://blog.ky2020.store/2021/06/07/debounce-with-use-effect-in-react.html","datePublished":"2021-06-07T09:56:00+00:00","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://blog.ky2020.store/2021/06/07/debounce-with-use-effect-in-react.html"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://blog.ky2020.store/feed.xml" title="Andrew's Blog" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Andrew&#39;s Blog</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about.html">关于我</a><a class="page-link" href="/projects.html">项目列表</a><a class="page-link" href="/toolbox.html">工具箱</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">使用useEffect 钩子实现防抖效果</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2021-06-07T09:56:00+00:00" itemprop="datePublished">Jun 7, 2021
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <h3 id="什么是防抖">什么是防抖</h3>
+<p>防抖又称为函数防抖，它是指对于在事件被触发n秒后再执行的回调，如果在这n秒内又重新被触发，则重新开始计时，是常见的优化方法。</p>
+
+<h3 id="为什么要防抖">为什么要防抖</h3>
+
+<p>比如有一个实时搜索功能，用户可以根据名字或者标签搜索商品。搜索是当用户打字时立即发生的。如果打开浏览器的开发者工具，你会看到下面的网络请求列表。</p>
+
+<p><img src="/images/undebounced-requests.png" alt="undebounced-requests.png" /></p>
+
+<p>一般请求列表只有最后一个请求返回的结果才是用户想要的。那么问题就出现了，之前的请求都是多余的，它们会浪费服务器宝贵的资源。为了阻止无意义的请求，我们必须对请求进行过滤，防抖节流就是这么来的。</p>
+
+<p>使用防抖之后的网络请求列表：</p>
+
+<p><img src="/images/debounced-requests.png" alt="debounced-requests.png" /></p>
+
+<h3 id="如何解决这个问题">如何解决这个问题</h3>
+<p>解决方法是将请求延时一小段时间，比如0.5秒钟。如果在这0.5秒之内有另外一个请求发生，则清除之前的请求，同时将新的请求延时0.5秒钟。通过这个方式我们能保证0.5秒之内只有一个请求发出。这样就实现了节流防抖。</p>
+
+<h3 id="代码示例">代码示例</h3>
+<p>创建一个自定义的钩子 useDebouncedSearch</p>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nx">axios</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">axios</span><span class="dl">"</span><span class="p">;</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">useEffect</span><span class="p">,</span> <span class="nx">useState</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">react</span><span class="dl">"</span><span class="p">;</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">API_URL</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">./constant</span><span class="dl">"</span><span class="p">;</span>
+
+<span class="kd">const</span> <span class="nx">useDebouceSearch</span> <span class="o">=</span> <span class="p">(</span><span class="nx">terms</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="p">[</span><span class="nx">data</span><span class="p">,</span> <span class="nx">setData</span><span class="p">]</span> <span class="o">=</span> <span class="nx">useState</span><span class="p">([]);</span>
+  <span class="kd">const</span> <span class="p">[</span><span class="nx">loading</span><span class="p">,</span> <span class="nx">setLoading</span><span class="p">]</span> <span class="o">=</span> <span class="nx">useState</span><span class="p">(</span><span class="kc">false</span><span class="p">);</span>
+  <span class="kd">const</span> <span class="p">[</span><span class="nx">error</span><span class="p">,</span> <span class="nx">setError</span><span class="p">]</span> <span class="o">=</span> <span class="nx">useState</span><span class="p">();</span>
+  <span class="nx">useEffect</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nx">setError</span><span class="p">(</span><span class="kc">null</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">terms</span><span class="p">)</span> <span class="p">{</span>
+      <span class="kd">const</span> <span class="nx">newTimer</span> <span class="o">=</span> <span class="nx">setTimeout</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+        <span class="p">(</span><span class="k">async</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+          <span class="k">try</span> <span class="p">{</span>
+            <span class="nx">setLoading</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
+            <span class="kd">const</span> <span class="nx">res</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">axios</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s2">`</span><span class="p">${</span><span class="nx">API_URL</span><span class="p">}</span><span class="s2">/items`</span><span class="p">,</span> <span class="p">{</span>
+              <span class="na">params</span><span class="p">:</span> <span class="p">{</span> <span class="na">label</span><span class="p">:</span> <span class="nx">terms</span> <span class="p">}</span>
+            <span class="p">});</span>
+            <span class="nx">setData</span><span class="p">(</span><span class="nx">res</span><span class="p">.</span><span class="nx">data</span><span class="p">);</span>
+          <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">setError</span><span class="p">(</span><span class="nx">error</span><span class="p">);</span>
+          <span class="p">}</span> <span class="k">finally</span> <span class="p">{</span>
+            <span class="nx">setLoading</span><span class="p">(</span><span class="kc">false</span><span class="p">);</span>
+          <span class="p">}</span>
+        <span class="p">})();</span>
+      <span class="p">},</span> <span class="mi">500</span><span class="p">);</span>
+      <span class="k">return</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="nx">clearTimeout</span><span class="p">(</span><span class="nx">newTimer</span><span class="p">);</span>
+  <span class="p">},</span> <span class="p">[</span><span class="nx">terms</span><span class="p">]);</span>
+
+  <span class="k">return</span> <span class="p">{</span> <span class="nx">data</span><span class="p">,</span> <span class="nx">loading</span><span class="p">,</span> <span class="nx">error</span> <span class="p">};</span>
+<span class="p">};</span>
+            
+<span class="k">export</span> <span class="k">default</span> <span class="nx">useDebouceSearch</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>上面示例代码中关键部分为</p>
+
+<ol>
+  <li>使用<code class="language-plaintext highlighter-rouge">setTimeout</code>创建了一个延时任务，在0.5秒钟之后执行；</li>
+  <li><code class="language-plaintext highlighter-rouge">useEffect</code>钩子返回一个函数 <code class="language-plaintext highlighter-rouge">() =&gt; clearTimeout(newTimer);</code>如果 <code class="language-plaintext highlighter-rouge">useEffect</code> 返回一个函数，刚这个函数会在下次 <code class="language-plaintext highlighter-rouge">useEffect</code> 之前执行。</li>
+</ol>
+
+<p>完整示例代码: <a href="https://codesandbox.io/s/debounce-with-use-effect-bbvf5">https://codesandbox.io/s/debounce-with-use-effect-bbvf5</a></p>
+
+  </div><a class="u-url" href="/2021/06/07/debounce-with-use-effect-in-react.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Andrew&#39;s Blog</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Andrew&#39;s Blog</li><li><a class="u-email" href="mailto:zzcv20051122@126.com">zzcv20051122@126.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/yyandrew"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">yyandrew</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>A Rubyist&#39;s Blog.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

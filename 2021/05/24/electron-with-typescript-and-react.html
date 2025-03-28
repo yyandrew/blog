@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>使用react，typescript开发electron应用 | Andrew’s Blog</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="使用react，typescript开发electron应用" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="创建一个简单的 electron 项目 初始化一个项目 yarn init -y yarn add -D electron 创建 electron 入口文件" />
+<meta property="og:description" content="创建一个简单的 electron 项目 初始化一个项目 yarn init -y yarn add -D electron 创建 electron 入口文件" />
+<link rel="canonical" href="https://blog.ky2020.store/2021/05/24/electron-with-typescript-and-react.html" />
+<meta property="og:url" content="https://blog.ky2020.store/2021/05/24/electron-with-typescript-and-react.html" />
+<meta property="og:site_name" content="Andrew’s Blog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-05-24T15:10:00+00:00" />
+<script type="application/ld+json">
+{"description":"创建一个简单的 electron 项目 初始化一个项目 yarn init -y yarn add -D electron 创建 electron 入口文件","headline":"使用react，typescript开发electron应用","dateModified":"2021-05-24T15:10:00+00:00","url":"https://blog.ky2020.store/2021/05/24/electron-with-typescript-and-react.html","datePublished":"2021-05-24T15:10:00+00:00","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://blog.ky2020.store/2021/05/24/electron-with-typescript-and-react.html"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://blog.ky2020.store/feed.xml" title="Andrew's Blog" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Andrew&#39;s Blog</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about.html">关于我</a><a class="page-link" href="/projects.html">项目列表</a><a class="page-link" href="/toolbox.html">工具箱</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">使用react，typescript开发electron应用</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2021-05-24T15:10:00+00:00" itemprop="datePublished">May 24, 2021
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <h4 id="创建一个简单的-electron-项目">创建一个简单的 electron 项目</h4>
+<ol>
+  <li>初始化一个项目
+    <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code> yarn init <span class="nt">-y</span>
+ yarn add <span class="nt">-D</span> electron
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>创建 electron 入口文件</p>
+
+    <div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="c1">// src/electron.js</span>
+ <span class="kd">const</span> <span class="p">{</span> <span class="nx">app</span><span class="p">,</span> <span class="nx">BrowserWindow</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">electron</span><span class="dl">'</span><span class="p">)</span>
+
+ <span class="kd">function</span> <span class="nx">createWindow</span><span class="p">()</span> <span class="p">{</span>
+   <span class="kd">let</span> <span class="nx">win</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">BrowserWindow</span><span class="p">({</span>
+     <span class="na">width</span><span class="p">:</span> <span class="mi">800</span><span class="p">,</span>
+     <span class="na">height</span><span class="p">:</span> <span class="mi">600</span><span class="p">,</span>
+     <span class="na">webPreferences</span><span class="p">:</span> <span class="p">{</span>
+       <span class="na">nodeIntegration</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+     <span class="p">},</span>
+   <span class="p">})</span>
+   <span class="nx">win</span><span class="p">.</span><span class="nx">loadFile</span><span class="p">(</span><span class="dl">'</span><span class="s1">./index.html</span><span class="dl">'</span><span class="p">)</span>
+ <span class="p">}</span>
+
+ <span class="nx">app</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="dl">'</span><span class="s1">ready</span><span class="dl">'</span><span class="p">,</span> <span class="nx">createWindow</span><span class="p">)</span>
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>创建 electron 界面入口文件</p>
+
+    <div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="c">&lt;!-- // src/index.html --&gt;</span>
+ <span class="cp">&lt;!DOCTYPE html&gt;</span>
+ <span class="nt">&lt;html&gt;</span>
+   <span class="nt">&lt;head&gt;</span>
+     <span class="nt">&lt;meta</span> <span class="na">charset=</span><span class="s">"utf-8"</span><span class="nt">&gt;</span>
+     <span class="nt">&lt;meta</span> <span class="na">name=</span><span class="s">"viewport"</span> <span class="na">content=</span><span class="s">"width=device-width"</span><span class="nt">&gt;</span>
+     <span class="nt">&lt;title&gt;</span>Hello world<span class="nt">&lt;/title&gt;</span>
+   <span class="nt">&lt;/head&gt;</span>
+   <span class="nt">&lt;body&gt;</span>
+     <span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">"app"</span><span class="nt">&gt;</span>
+       <span class="nt">&lt;h1&gt;</span>Hello world<span class="nt">&lt;/h1&gt;</span>
+     <span class="nt">&lt;/div&gt;</span>
+   <span class="nt">&lt;/body&gt;</span>
+ <span class="nt">&lt;/html&gt;</span>
+</code></pre></div>    </div>
+  </li>
+  <li>在 package.json 添加一个命令
+    <div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="w"> </span><span class="nl">"scripts"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+   </span><span class="nl">"start"</span><span class="p">:</span><span class="w"> </span><span class="s2">"electron src/electron.js"</span><span class="w">
+ </span><span class="p">}</span><span class="w">
+</span></code></pre></div>    </div>
+    <p>运行 <code class="language-plaintext highlighter-rouge">yarn start</code> 可以查看效果。</p>
+  </li>
+</ol>
+
+<h4 id="添加-typescript">添加 typescript</h4>
+<ol>
+  <li>安装 typescript 依赖。<code class="language-plaintext highlighter-rouge">yarn add -D typescript</code>；</li>
+  <li>添加 typescript 配置文件，<code class="language-plaintext highlighter-rouge">touch tsconfig.json</code>；</li>
+  <li>修改 package.json，添加一个命令将 typescript 文件编译成 js 文件；
+    <div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="w"> </span><span class="nl">"scripts"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+     </span><span class="nl">"build"</span><span class="p">:</span><span class="w"> </span><span class="s2">"tsc src/electron.ts"</span><span class="w">
+ </span><span class="p">}</span><span class="w">
+</span></code></pre></div>    </div>
+  </li>
+  <li>重命名 <code class="language-plaintext highlighter-rouge">electron.js</code> 为 <code class="language-plaintext highlighter-rouge">electron.ts</code>。</li>
+</ol>
+
+<h4 id="添加-webpack">添加 webpack</h4>
+<ol>
+  <li>安装依赖。<code class="language-plaintext highlighter-rouge">yarn add -D webpack webpack-cli ts-loader</code></li>
+  <li>添加 webpack 配置文件。
+    <div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="c1">// webpack.config.js</span>
+ <span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="p">{</span>
+   <span class="na">mode</span><span class="p">:</span> <span class="dl">'</span><span class="s1">development</span><span class="dl">'</span><span class="p">,</span>
+   <span class="na">entry</span><span class="p">:</span> <span class="dl">'</span><span class="s1">./src/electron.ts</span><span class="dl">'</span><span class="p">,</span>
+   <span class="na">target</span><span class="p">:</span> <span class="dl">'</span><span class="s1">electron-main</span><span class="dl">'</span><span class="p">,</span>
+   <span class="na">module</span><span class="p">:</span> <span class="p">{</span>
+     <span class="na">rules</span><span class="p">:</span> <span class="p">[</span>
+       <span class="p">{</span>
+         <span class="na">test</span><span class="p">:</span> <span class="sr">/</span><span class="se">\.</span><span class="sr">ts$/</span><span class="p">,</span>
+         <span class="na">include</span><span class="p">:</span> <span class="sr">/src/</span><span class="p">,</span>
+         <span class="na">use</span><span class="p">:</span> <span class="p">[{</span> <span class="na">loader</span><span class="p">:</span> <span class="dl">'</span><span class="s1">ts-loader</span><span class="dl">'</span> <span class="p">}],</span>
+       <span class="p">},</span>
+     <span class="p">],</span>
+   <span class="p">},</span>
+   <span class="na">output</span><span class="p">:</span> <span class="p">{</span>
+     <span class="na">path</span><span class="p">:</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="dl">'</span><span class="s1">/src</span><span class="dl">'</span><span class="p">,</span>
+     <span class="na">filename</span><span class="p">:</span> <span class="dl">'</span><span class="s1">electron.js</span><span class="dl">'</span><span class="p">,</span>
+   <span class="p">},</span>
+ <span class="p">}</span>
+</code></pre></div>    </div>
+    <p>配置项目的各个含义为：</p>
+    <ul>
+      <li><code class="language-plaintext highlighter-rouge">mode: development</code> 开发环境；</li>
+      <li><code class="language-plaintext highlighter-rouge"> entry: './src/electron.ts'</code> 入口文件地址；</li>
+      <li><code class="language-plaintext highlighter-rouge">target: 'electron-main'</code> webpack 自动检测打包 electron 主进程代码文件；</li>
+      <li><code class="language-plaintext highlighter-rouge"> test: /\.ts$/</code> 规则会作用于 <code class="language-plaintext highlighter-rouge">.ts</code> 结尾的文件；</li>
+      <li><code class="language-plaintext highlighter-rouge">include: /src/</code> <code class="language-plaintext highlighter-rouge">src</code> 文件夹里的文件会被使用规则；</li>
+      <li><code class="language-plaintext highlighter-rouge">use: [{ loader: 'ts-loader' }]</code> 对于匹配成功的文件使用什么插件进行打包；</li>
+      <li><code class="language-plaintext highlighter-rouge">path: __dirname + '/src'</code> 打包好的文件的输出目录；</li>
+      <li><code class="language-plaintext highlighter-rouge">filename: 'electron.js'</code> 打包文件的文件名。</li>
+    </ul>
+  </li>
+  <li>修改 build 命令
+    <div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="w"> </span><span class="err">//</span><span class="w"> </span><span class="err">package.json</span><span class="w">
+   </span><span class="nl">"scripts"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+     </span><span class="nl">"start"</span><span class="p">:</span><span class="w"> </span><span class="s2">"electron src/electron.js"</span><span class="p">,</span><span class="w">
+     </span><span class="nl">"build"</span><span class="p">:</span><span class="w"> </span><span class="s2">"webpack --config ./webpack.config.js"</span><span class="w">
+   </span><span class="p">}</span><span class="w">
+</span></code></pre></div>    </div>
+  </li>
+</ol>
+
+<h4 id="添加-react">添加 react</h4>
+<ol>
+  <li>添加依赖。<code class="language-plaintext highlighter-rouge">yarn add -D react react-dom @types/react @types/react-dom</code></li>
+  <li>添加 React 入口文件。
+    <div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="c1">// src/react.tsx</span>
+ <span class="k">import</span> <span class="o">*</span> <span class="k">as</span> <span class="nx">React</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">react</span><span class="dl">'</span>
+ <span class="k">import</span> <span class="o">*</span> <span class="k">as</span> <span class="nx">ReactDOM</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">react-dom</span><span class="dl">'</span>
+
+ <span class="k">export</span> <span class="kd">const</span> <span class="nx">Index</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="o">&lt;</span><span class="nx">h2</span><span class="o">&gt;</span><span class="nx">Hello</span> <span class="nx">React</span><span class="o">!&lt;</span><span class="sr">/h2</span><span class="err">&gt;
+</span>
+ <span class="nx">ReactDOM</span><span class="p">.</span><span class="nx">render</span><span class="p">(</span><span class="o">&lt;</span><span class="nx">Index</span> <span class="o">/&gt;</span><span class="p">,</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="dl">'</span><span class="s1">#app</span><span class="dl">'</span><span class="p">))</span>
+</code></pre></div>    </div>
+  </li>
+  <li>添加配置使得 typescript 能够识别编译 tsx 文件。
+    <div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="w"> </span><span class="err">//</span><span class="w"> </span><span class="err">tsconfig.json</span><span class="w">
+ </span><span class="p">{</span><span class="w">
+   </span><span class="nl">"compilerOptions"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+     </span><span class="nl">"jsx"</span><span class="p">:</span><span class="w"> </span><span class="s2">"react"</span><span class="w">
+   </span><span class="p">}</span><span class="w">
+ </span><span class="p">}</span><span class="w">
+</span></code></pre></div>    </div>
+  </li>
+  <li>添加新的入口文件。首先添加新的依赖 <code class="language-plaintext highlighter-rouge">yarn add -D html-webpack-plugin</code>。
+    <div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="c1">// webpack.config.js</span>
+ <span class="kd">const</span> <span class="nx">HtmlWebpackPlugin</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">html-webpack-plugin</span><span class="dl">'</span><span class="p">)</span>
+
+ <span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="p">[</span>
+   <span class="p">...</span>
+     <span class="p">{</span>
+     <span class="nl">mode</span><span class="p">:</span> <span class="dl">'</span><span class="s1">development</span><span class="dl">'</span><span class="p">,</span>
+     <span class="nx">entry</span><span class="p">:</span> <span class="dl">'</span><span class="s1">./src/react.tsx</span><span class="dl">'</span><span class="p">,</span>
+     <span class="nx">target</span><span class="p">:</span> <span class="dl">'</span><span class="s1">electron-renderer</span><span class="dl">'</span><span class="p">,</span>
+     <span class="nx">devtool</span><span class="p">:</span> <span class="dl">'</span><span class="s1">source-map</span><span class="dl">'</span><span class="p">,</span>
+     <span class="nx">module</span><span class="p">:</span> <span class="p">{</span>
+       <span class="nl">rules</span><span class="p">:</span> <span class="p">[</span>
+         <span class="p">{</span>
+           <span class="na">test</span><span class="p">:</span> <span class="sr">/</span><span class="se">\.</span><span class="sr">ts</span><span class="se">(</span><span class="sr">x</span><span class="se">?)</span><span class="sr">$/</span><span class="p">,</span>
+           <span class="na">include</span><span class="p">:</span> <span class="sr">/src/</span><span class="p">,</span>
+           <span class="na">use</span><span class="p">:</span> <span class="p">[{</span> <span class="na">loader</span><span class="p">:</span> <span class="dl">'</span><span class="s1">ts-loader</span><span class="dl">'</span> <span class="p">}],</span>
+         <span class="p">},</span>
+       <span class="p">],</span>
+     <span class="p">},</span>
+     <span class="nx">output</span><span class="p">:</span> <span class="p">{</span>
+       <span class="nl">path</span><span class="p">:</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="dl">'</span><span class="s1">/dist</span><span class="dl">'</span><span class="p">,</span>
+       <span class="nx">filename</span><span class="p">:</span> <span class="dl">'</span><span class="s1">react.js</span><span class="dl">'</span><span class="p">,</span>
+     <span class="p">},</span>
+     <span class="nx">plugins</span><span class="p">:</span> <span class="p">[</span>
+       <span class="k">new</span> <span class="nx">HtmlWebpackPlugin</span><span class="p">({</span>
+         <span class="na">template</span><span class="p">:</span> <span class="dl">'</span><span class="s1">./src/index.html</span><span class="dl">'</span><span class="p">,</span>
+       <span class="p">}),</span>
+     <span class="p">],</span>
+   <span class="p">},</span>
+ <span class="p">]</span>
+</code></pre></div>    </div>
+    <p><code class="language-plaintext highlighter-rouge">target: 'electron-renderer'</code> webpack 自动检测打包 electron 渲染程代码文件；</p>
+  </li>
+  <li>修改 electron.js 的输出目录为 <code class="language-plaintext highlighter-rouge">./dist/</code>
+    <div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="c1">// webpack.config.js</span>
+ <span class="p">...</span>
+   <span class="nx">output</span><span class="p">:</span> <span class="p">{</span>
+     <span class="nl">path</span><span class="p">:</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="dl">'</span><span class="s1">/dist</span><span class="dl">'</span><span class="p">,</span>
+     <span class="nx">filename</span><span class="p">:</span> <span class="dl">'</span><span class="s1">electron.js</span><span class="dl">'</span>
+   <span class="p">}</span>
+</code></pre></div>    </div>
+  </li>
+  <li>修改 start 命令
+    <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="s2">"</span><span class="s">scripts"</span><span class="pi">:</span> <span class="pi">{</span>
+   <span class="nv">...</span>
+   <span class="nv">"start"</span><span class="pi">:</span> <span class="s2">"</span><span class="s">yarn</span><span class="nv"> </span><span class="s">build</span><span class="nv"> </span><span class="s">&amp;&amp;</span><span class="nv"> </span><span class="s">electron</span><span class="nv"> </span><span class="s">./dist/electron.js"</span>
+ <span class="pi">}</span>
+</code></pre></div>    </div>
+  </li>
+</ol>
+
+<p>运行 <code class="language-plaintext highlighter-rouge">yarn start</code> 命令，如果能够看到如下的界面，说明环境搭建成功了。</p>
+
+<p><img src="/images/final-electron-app-by-react-and-typescript.png" alt="final-electron-app-by-react-and-typescript.png" /></p>
+
+  </div><a class="u-url" href="/2021/05/24/electron-with-typescript-and-react.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Andrew&#39;s Blog</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Andrew&#39;s Blog</li><li><a class="u-email" href="mailto:zzcv20051122@126.com">zzcv20051122@126.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/yyandrew"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">yyandrew</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>A Rubyist&#39;s Blog.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

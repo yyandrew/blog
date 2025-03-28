@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>使用rspec+factory_girl测试Rails邮件(ActionMailer) | Andrew’s Blog</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="使用rspec+factory_girl测试Rails邮件(ActionMailer)" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="邮件测试其实只用对是不是可以发送，邮件标题，发件人，收件人，邮件的内容的关键部分编写测试用例就可以了。 下面对Rails的邮件进行测试." />
+<meta property="og:description" content="邮件测试其实只用对是不是可以发送，邮件标题，发件人，收件人，邮件的内容的关键部分编写测试用例就可以了。 下面对Rails的邮件进行测试." />
+<link rel="canonical" href="https://blog.ky2020.store/rails/2015/04/04/how-to-write-test-for-notifier-with-rspec.html" />
+<meta property="og:url" content="https://blog.ky2020.store/rails/2015/04/04/how-to-write-test-for-notifier-with-rspec.html" />
+<meta property="og:site_name" content="Andrew’s Blog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2015-04-04T11:38:00+00:00" />
+<script type="application/ld+json">
+{"description":"邮件测试其实只用对是不是可以发送，邮件标题，发件人，收件人，邮件的内容的关键部分编写测试用例就可以了。 下面对Rails的邮件进行测试.","headline":"使用rspec+factory_girl测试Rails邮件(ActionMailer)","dateModified":"2015-04-04T11:38:00+00:00","url":"https://blog.ky2020.store/rails/2015/04/04/how-to-write-test-for-notifier-with-rspec.html","datePublished":"2015-04-04T11:38:00+00:00","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://blog.ky2020.store/rails/2015/04/04/how-to-write-test-for-notifier-with-rspec.html"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://blog.ky2020.store/feed.xml" title="Andrew's Blog" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Andrew&#39;s Blog</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about.html">关于我</a><a class="page-link" href="/projects.html">项目列表</a><a class="page-link" href="/toolbox.html">工具箱</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">使用rspec+factory_girl测试Rails邮件(ActionMailer)</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2015-04-04T11:38:00+00:00" itemprop="datePublished">Apr 4, 2015
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p>邮件测试其实只用对是不是可以发送，邮件标题，发件人，收件人，邮件的内容的关键部分编写测试用例就可以了。
+下面对Rails的邮件进行测试.</p>
+
+<p>假设我们有一个mailer用来发邮件：</p>
+
+<p>app/mailers/notifier.rb</p>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Notifier</span> <span class="o">&lt;</span> <span class="no">ActionMailer</span><span class="o">::</span><span class="no">Base</span>
+  <span class="n">default</span> <span class="ss">from: </span><span class="s2">"noreply@example.com"</span>
+
+  <span class="k">def</span> <span class="nf">exchange_notifier_mail</span><span class="p">(</span><span class="n">rate</span><span class="p">)</span>
+    <span class="vi">@rate</span> <span class="o">=</span> <span class="n">rate</span>
+    <span class="n">mail</span><span class="p">(</span><span class="ss">to: </span><span class="s2">"andrew@example.com"</span><span class="p">,</span> <span class="ss">subject: </span><span class="s2">"please exchange"</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>邮件的内容如下：</p>
+
+<p>app/views/notifier/exchange_notifier_mail.html.haml</p>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">%</span><span class="n">div</span> <span class="n">please</span> <span class="n">exchange</span>
+<span class="o">%</span><span class="n">div</span><span class="o">=</span> <span class="s2">"the rate is </span><span class="si">#{</span><span class="vi">@rate</span><span class="si">}</span><span class="s2">"</span>
+</code></pre></div></div>
+
+<p>使用<code class="language-plaintext highlighter-rouge">User</code>的<strong>deliver_exchange_notifier</strong>方法来发这封邮件：</p>
+
+<p>app/models/user.rb</p>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">User</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+  <span class="k">def</span> <span class="nf">deliver_exchange_notifier!</span>
+    <span class="no">Notifier</span><span class="p">.</span><span class="nf">exchange_notifier_mail</span><span class="p">(</span><span class="s2">"6.20"</span><span class="p">).</span><span class="nf">deliver</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>在编写测试代码前我们要在<strong>config/environment/test.rb</strong>中添加如下代码：</p>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">config</span><span class="p">.</span><span class="nf">action_mailer</span><span class="p">.</span><span class="nf">delivery_method</span> <span class="o">=</span> <span class="ss">:test</span>
+</code></pre></div></div>
+<p>这一行代码是标记邮件不会被发送出去，它只会被存储在<strong>ActionMailer::Base.deliveries</strong>数组里。接下来我们就可以写测试用例了。</p>
+
+<p>结合<strong>FactoryGirl</strong>创建测试数据：</p>
+
+<p>spec/factories/user.rb</p>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="no">FactoryGirl</span><span class="p">.</span><span class="nf">define</span> <span class="k">do</span>
+  <span class="n">factory</span> <span class="ss">:user</span> <span class="k">do</span>
+    <span class="nb">name</span> <span class="s2">"Andrew Yang"</span>
+    <span class="n">email</span> <span class="s2">"andrew@example.com"</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>spec/models/user_spec.rb</p>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">require</span> <span class="s1">'rails_helper'</span>
+
+<span class="no">RSpec</span><span class="p">.</span><span class="nf">describe</span> <span class="no">User</span><span class="p">,</span> <span class="ss">type: :model</span> <span class="k">do</span>
+  <span class="n">let</span><span class="p">(</span><span class="ss">:user</span><span class="p">)</span> <span class="p">{</span><span class="no">FactoryGirl</span><span class="p">.</span><span class="nf">create</span> <span class="ss">:user</span><span class="p">}</span>
+
+  <span class="n">describe</span> <span class="s1">'deliver_password_reset instruction'</span> <span class="k">do</span>
+    <span class="n">it</span> <span class="s1">'should send new email'</span> <span class="k">do</span>
+      <span class="n">expect</span> <span class="p">{</span><span class="n">user</span><span class="p">.</span><span class="nf">deliver_exchange_notifier!</span><span class="p">}.</span><span class="nf">to</span> <span class="n">change</span> <span class="p">{</span><span class="no">ActionMailer</span><span class="o">::</span><span class="no">Base</span><span class="p">.</span><span class="nf">deliveries</span><span class="p">.</span><span class="nf">count</span><span class="p">}.</span><span class="nf">to</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div></div>
+<p>运行<strong>rspec spec/models/user_spec.rb</strong>可以跑测试用例了。如果输出</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>.
+
+Finished in 0.41145 seconds (files took 9.26 seconds to load)
+1 example, 0 failures
+</code></pre></div></div>
+<p>说明测试通过了。你的代码是可以正常工作的。</p>
+
+<p>下面继续添加notifier测试用例。主要是测试邮件主题，发件人，收件人。添加如下代码：</p>
+
+<p>app/spec/mailers/notifier_spec.rb</p>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"rails_helper"</span>
+
+<span class="no">RSpec</span><span class="p">.</span><span class="nf">describe</span> <span class="no">Notifier</span><span class="p">,</span> <span class="ss">type: :mailer</span> <span class="k">do</span>
+  <span class="n">let</span><span class="p">(</span><span class="ss">:user</span><span class="p">)</span> <span class="p">{</span><span class="n">mock_model</span> <span class="no">User</span><span class="p">,</span> <span class="ss">email: </span><span class="s2">"andrew@example.com"</span><span class="p">}</span> 
+  <span class="n">let</span><span class="p">(</span><span class="ss">:rate</span><span class="p">)</span> <span class="p">{</span><span class="s2">"6.20"</span><span class="p">}</span>
+
+  <span class="n">describe</span> <span class="s1">'exchange notifier mail'</span> <span class="k">do</span>
+    <span class="n">it</span> <span class="s2">"renders the subject"</span> <span class="k">do</span>
+      <span class="n">mail</span> <span class="o">=</span> <span class="no">Notifier</span><span class="p">.</span><span class="nf">exchange_notifier_mail</span><span class="p">(</span><span class="n">rate</span><span class="p">)</span>
+      <span class="n">expect</span><span class="p">(</span><span class="n">mail</span><span class="p">.</span><span class="nf">subject</span><span class="p">).</span><span class="nf">to</span> <span class="n">eq</span><span class="p">(</span><span class="s2">"please exchange"</span><span class="p">)</span>
+    <span class="k">end</span>
+    <span class="n">it</span> <span class="s2">"send to andrew@example.com"</span> <span class="k">do</span>
+      <span class="n">mail</span> <span class="o">=</span> <span class="no">Notifier</span><span class="p">.</span><span class="nf">exchange_notifier_mail</span><span class="p">(</span><span class="n">rate</span><span class="p">)</span>
+      <span class="n">expect</span><span class="p">(</span><span class="n">mail</span><span class="p">.</span><span class="nf">to</span><span class="p">).</span><span class="nf">to</span> <span class="n">eq</span><span class="p">([</span><span class="s2">"andrew@example.com"</span><span class="p">])</span>
+    <span class="k">end</span>
+    <span class="n">it</span> <span class="s2">"send from noreply@example.com"</span> <span class="k">do</span>
+      <span class="n">mail</span> <span class="o">=</span> <span class="no">Notifier</span><span class="p">.</span><span class="nf">exchange_notifier_mail</span><span class="p">(</span><span class="n">rate</span><span class="p">)</span>
+      <span class="n">expect</span><span class="p">(</span><span class="n">mail</span><span class="p">.</span><span class="nf">from</span><span class="p">).</span><span class="nf">to</span> <span class="n">eq</span><span class="p">([</span><span class="s2">"noreply@example.com"</span><span class="p">])</span> 
+    <span class="k">end</span>
+    <span class="n">it</span> <span class="s2">"content should include rate value"</span> <span class="k">do</span>
+      <span class="n">mail</span> <span class="o">=</span> <span class="no">Notifier</span><span class="p">.</span><span class="nf">exchange_notifier_mail</span><span class="p">(</span><span class="n">rate</span><span class="p">)</span>
+      <span class="n">expect</span><span class="p">(</span><span class="n">mail</span><span class="p">.</span><span class="nf">body</span><span class="p">.</span><span class="nf">encoded</span><span class="p">).</span><span class="nf">to</span> <span class="n">match</span><span class="p">(</span><span class="s2">"6.20"</span> <span class="p">)</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div></div>
+<p>运行<strong>rspec spec/mailers/notifier_spec.rb</strong>。如果输出</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>....
+
+Finished in 0.69902 seconds (files took 8.15 seconds to load)
+4 examples, 0 failures
+</code></pre></div></div>
+<p>那么恭喜你你的代码可以使用没有问题。</p>
+
+  </div><a class="u-url" href="/rails/2015/04/04/how-to-write-test-for-notifier-with-rspec.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Andrew&#39;s Blog</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Andrew&#39;s Blog</li><li><a class="u-email" href="mailto:zzcv20051122@126.com">zzcv20051122@126.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/yyandrew"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">yyandrew</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>A Rubyist&#39;s Blog.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Ruby内置单例模式是如何实现的 | Andrew’s Blog</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="Ruby内置单例模式是如何实现的" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="注意：这里提到的单例模式(Singleton Pattern)跟元编程里里的单件类(Singleton Class)是完全不一样的东西。" />
+<meta property="og:description" content="注意：这里提到的单例模式(Singleton Pattern)跟元编程里里的单件类(Singleton Class)是完全不一样的东西。" />
+<link rel="canonical" href="https://blog.ky2020.store/ruby/2020/10/20/how-does-ruby-implement-singleton-pattern.html" />
+<meta property="og:url" content="https://blog.ky2020.store/ruby/2020/10/20/how-does-ruby-implement-singleton-pattern.html" />
+<meta property="og:site_name" content="Andrew’s Blog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-10-20T08:05:00+00:00" />
+<script type="application/ld+json">
+{"description":"注意：这里提到的单例模式(Singleton Pattern)跟元编程里里的单件类(Singleton Class)是完全不一样的东西。","headline":"Ruby内置单例模式是如何实现的","dateModified":"2020-10-20T08:05:00+00:00","url":"https://blog.ky2020.store/ruby/2020/10/20/how-does-ruby-implement-singleton-pattern.html","datePublished":"2020-10-20T08:05:00+00:00","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://blog.ky2020.store/ruby/2020/10/20/how-does-ruby-implement-singleton-pattern.html"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://blog.ky2020.store/feed.xml" title="Andrew's Blog" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Andrew&#39;s Blog</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about.html">关于我</a><a class="page-link" href="/projects.html">项目列表</a><a class="page-link" href="/toolbox.html">工具箱</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Ruby内置单例模式是如何实现的</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2020-10-20T08:05:00+00:00" itemprop="datePublished">Oct 20, 2020
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p>注意：这里提到的单例模式(Singleton Pattern)跟元编程里里的单件类(Singleton Class)是完全不一样的东西。</p>
+
+<p>单例模式保证可以保证调用一个类的<code class="language-plaintext highlighter-rouge">instance</code>时候确保始终只有一个实例被创建。在<code class="language-plaintext highlighter-rouge">Sidekiq::CLI.instance</code> 方法里有用到这个功能。这意味着无论你执行多少次<code class="language-plaintext highlighter-rouge">bundle exec sidekiq</code>，只会产生一个CLI实例。</p>
+
+<p>在开始探索实现原理之前，我们先看看单例模式是如何使用的。先看代码：</p>
+
+<pre><code class="language-ruby ">require 'singleton'
+class Foo
+  include Singleton
+end
+Foo.instance == Foo.instance # =&gt; true
+</code></pre>
+
+<p>由于<code class="language-plaintext highlighter-rouge">Singleton</code>能够被包含，所以它应该是个module。从<a href="https://github.com/ruby/ruby/blob/18cecda46e427362fa3447679e5d8a917b5d6cb6/lib/singleton.rb#L94">源代码</a>可以看出它确实是个module。我们再看看<code class="language-plaintext highlighter-rouge">instance</code>这个方法，它应该产生的一个Foo的实例。但是它是在哪里定义的呢？我们可以通过[irb][https://github.com/ruby/irb]查看<code class="language-plaintext highlighter-rouge">instance</code>在哪里定义。</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>irb(main):007:0&gt; Foo.method(:instance).source_location
+=&gt; ["/Users/andrew/.asdf/installs/ruby/2.7.1/lib/ruby/2.7.0/singleton.rb", 121]
+</code></pre></div></div>
+
+<p>从最后一行输出可以看出它是被定义在<code class="language-plaintext highlighter-rouge">singleton.rb</code>。</p>
+
+<p>我们可以用VSCode打开本地或者<a href="https://github.com/ruby/ruby/blob/18cecda46e427362fa3447679e5d8a917b5d6cb6/lib/singleton.rb#L123">github上的ruby代码库</a></p>
+
+<p>这个方法的完整代码</p>
+
+<pre><code class="language-ruby ">def instance # :nodoc:
+  # 如果已经创建过单例模式的实例，则直接返回此实例
+  return @singleton__instance__ if @singleton__instance__
+  @singleton__mutex__.synchronize {
+    # 如果已经创建过单例模式的实例，则直接返回此实例
+    return @singleton__instance__ if @singleton__instance__
+    # 创建一个实例
+    @singleton__instance__ = new()
+  }
+  # 返回这个实例
+  @singleton__instance__
+end
+</code></pre>
+
+<p>这个方法<code class="language-plaintext highlighter-rouge">@singleton__mutex__</code>这个对象比较难理解，看起来像是某种多线程锁。</p>
+
+<p>这个对象是在<a href="https://github.com/ruby/ruby/blob/18cecda46e427362fa3447679e5d8a917b5d6cb6/lib/singleton.rb#L144"><code class="language-plaintext highlighter-rouge">__init__</code>方法</a>里被创建的。完整代码如下：</p>
+
+<pre><code class="language-ruby ">def __init__(klass) # :nodoc:
+  # 为实例变量@singleton__instance__赋值
+  klass.instance_eval {
+    @singleton__instance__ = nil
+    # 创建一个线程互斥锁，
+    # 如果要深入了解互斥锁，可以查看文档https://ruby-doc.org/core-2.5.0/Mutex.html
+    @singleton__mutex__ = Thread::Mutex.new
+  }
+  klass
+end
+</code></pre>
+
+<p>现在我们已经搞清楚<code class="language-plaintext highlighter-rouge">instance</code>是如何做只产生一个实例了。但是还有另外一个特性还有必要补充一下。这个特性是当一个类包含一个<code class="language-plaintext highlighter-rouge">Singleton</code>模块之后，你不能使用<code class="language-plaintext highlighter-rouge">new</code>创建实例了(这个说法不准确，因为你还是可以通过<code class="language-plaintext highlighter-rouge">Foo.send(:new)</code>来成功创建实例)，比如下面的代码是不能工作的：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>irb<span class="o">(</span>main<span class="o">)</span>:008:0&gt; Foo.new
+Traceback <span class="o">(</span>most recent call last<span class="o">)</span>:
+        4: from /Users/andrew/.asdf/installs/ruby/2.7.1/bin/irb:23:in <span class="sb">`</span>&lt;main&gt;<span class="s1">'
+        3: from /Users/andrew/.asdf/installs/ruby/2.7.1/bin/irb:23:in `load'</span>
+        2: from /Users/andrew/.asdf/installs/ruby/2.7.1/lib/ruby/gems/2.7.0/gems/irb-1.2.3/exe/irb:11:in <span class="sb">`</span>&lt;top <span class="o">(</span>required<span class="o">)&gt;</span><span class="s1">'
+        1: from (irb):8
+NoMethodError (private method `new'</span> called <span class="k">for </span>Foo:Class<span class="o">)</span>
+</code></pre></div></div>
+
+<p>错误信息很明显，<code class="language-plaintext highlighter-rouge">new</code>被转换成了私有方法。很显然这是<code class="language-plaintext highlighter-rouge">Singleton</code>帮我们做的。问题是如何做到的呢？答案就是：<code class="language-plaintext highlighter-rouge">Singleton</code>通过<a href="https://github.com/ruby/ruby/blob/18cecda46e427362fa3447679e5d8a917b5d6cb6/lib/singleton.rb#L162"><code class="language-plaintext highlighter-rouge">included</code></a>钩子将<code class="language-plaintext highlighter-rouge">new</code>方法转换成的私有方法。完整代码如下：</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">included</span><span class="p">(</span><span class="n">klass</span><span class="p">)</span>
+  <span class="k">super</span>
+  <span class="c1"># 将类公共方法`new`转换成私有方法</span>
+  <span class="n">klass</span><span class="p">.</span><span class="nf">private_class_method</span> <span class="ss">:new</span><span class="p">,</span> <span class="ss">:allocate</span>
+  <span class="n">klass</span><span class="p">.</span><span class="nf">extend</span> <span class="no">SingletonClassMethods</span>
+  <span class="no">Singleton</span><span class="p">.</span><span class="nf">__init__</span><span class="p">(</span><span class="n">klass</span><span class="p">)</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+
+  </div><a class="u-url" href="/ruby/2020/10/20/how-does-ruby-implement-singleton-pattern.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Andrew&#39;s Blog</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Andrew&#39;s Blog</li><li><a class="u-email" href="mailto:zzcv20051122@126.com">zzcv20051122@126.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/yyandrew"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">yyandrew</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>A Rubyist&#39;s Blog.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

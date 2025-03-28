@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>利用size避免N+1查询 | Andrew’s Blog</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="利用size避免N+1查询" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="比如说我们有两个model.它们分别是MenuItem和SubMenuItem # app/models/menu_item.rb class MenuItem &lt; ActiveRecord::Base has_many :sub_menu_item end # app/models/sub_menu_item.rb class SubMenuItem &lt; ActiveRecord::Base belongs :menu_item end ```ruby app/views/admin/menu_items/index.html.haml @menu_items.each do |menu| %tr %td= menu.position %td= menu.sub_menu_items.count # « 查询menu_item有多少个sub_menu_item" />
+<meta property="og:description" content="比如说我们有两个model.它们分别是MenuItem和SubMenuItem # app/models/menu_item.rb class MenuItem &lt; ActiveRecord::Base has_many :sub_menu_item end # app/models/sub_menu_item.rb class SubMenuItem &lt; ActiveRecord::Base belongs :menu_item end ```ruby app/views/admin/menu_items/index.html.haml @menu_items.each do |menu| %tr %td= menu.position %td= menu.sub_menu_items.count # « 查询menu_item有多少个sub_menu_item" />
+<link rel="canonical" href="https://blog.ky2020.store/rails/2015/09/11/use-size-but-count-to-avoid-n-plus-1-query-in-has-many-relationship.html" />
+<meta property="og:url" content="https://blog.ky2020.store/rails/2015/09/11/use-size-but-count-to-avoid-n-plus-1-query-in-has-many-relationship.html" />
+<meta property="og:site_name" content="Andrew’s Blog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2015-09-11T11:22:00+00:00" />
+<script type="application/ld+json">
+{"description":"比如说我们有两个model.它们分别是MenuItem和SubMenuItem # app/models/menu_item.rb class MenuItem &lt; ActiveRecord::Base has_many :sub_menu_item end # app/models/sub_menu_item.rb class SubMenuItem &lt; ActiveRecord::Base belongs :menu_item end ```ruby app/views/admin/menu_items/index.html.haml @menu_items.each do |menu| %tr %td= menu.position %td= menu.sub_menu_items.count # « 查询menu_item有多少个sub_menu_item","headline":"利用size避免N+1查询","dateModified":"2015-09-11T11:22:00+00:00","url":"https://blog.ky2020.store/rails/2015/09/11/use-size-but-count-to-avoid-n-plus-1-query-in-has-many-relationship.html","datePublished":"2015-09-11T11:22:00+00:00","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://blog.ky2020.store/rails/2015/09/11/use-size-but-count-to-avoid-n-plus-1-query-in-has-many-relationship.html"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://blog.ky2020.store/feed.xml" title="Andrew's Blog" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Andrew&#39;s Blog</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about.html">关于我</a><a class="page-link" href="/projects.html">项目列表</a><a class="page-link" href="/toolbox.html">工具箱</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">利用size避免N+1查询</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2015-09-11T11:22:00+00:00" itemprop="datePublished">Sep 11, 2015
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p>比如说我们有两个model.它们分别是MenuItem和SubMenuItem</p>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># app/models/menu_item.rb</span>
+<span class="k">class</span> <span class="nc">MenuItem</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+  <span class="n">has_many</span> <span class="ss">:sub_menu_item</span>
+<span class="k">end</span>
+</code></pre></div></div>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># app/models/sub_menu_item.rb</span>
+<span class="k">class</span> <span class="nc">SubMenuItem</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+  <span class="n">belongs</span> <span class="ss">:menu_item</span>
+<span class="k">end</span>
+</code></pre></div></div>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># app/views/admin/menu_items/index.html.haml</span>
+<span class="o">-</span> <span class="vi">@menu_items</span><span class="p">.</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">menu</span><span class="o">|</span>
+  <span class="o">%</span><span class="n">tr</span>
+    <span class="o">%</span><span class="n">td</span><span class="o">=</span> <span class="n">menu</span><span class="p">.</span><span class="nf">position</span>
+    <span class="o">%</span><span class="n">td</span><span class="o">=</span> <span class="n">menu</span><span class="p">.</span><span class="nf">sub_menu_items</span><span class="p">.</span><span class="nf">count</span> <span class="c1"># &lt;&lt; 查询menu_item有多少个sub_menu_item</span>
+
+</code></pre></div></div>
+<p>观察console后发现log有出现N+1查询的问题</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>MenuItem Load (0.9ms)  SELECT "menu_items".* FROM "menu_items"   ORDER BY menu_items.position ASC
+SubMenuItem Load (1.0ms)  SELECT "sub_menu_items".* FROM "sub_menu_items"  WHERE "sub_menu_items"."menu_item_id" IN (1, 2, 3, 13, 4, 5, 6, 7, 8, 9, 10, 11, 12)  ORDER BY sub_menu_items.position ASC
+ (0.6ms)  SELECT COUNT(*) FROM "sub_menu_items"  WHERE "sub_menu_items"."menu_item_id" = $1  [["menu_item_id", 1]]
+ (0.6ms)  SELECT COUNT(*) FROM "sub_menu_items"  WHERE "sub_menu_items"."menu_item_id" = $1  [["menu_item_id", 2]]
+ (1.2ms)  SELECT COUNT(*) FROM "sub_menu_items"  WHERE "sub_menu_items"."menu_item_id" = $1  [["menu_item_id", 3]]
+ (0.6ms)  SELECT COUNT(*) FROM "sub_menu_items"  WHERE "sub_menu_items"."menu_item_id" = $1  [["menu_item_id", 13]]
+ (1.2ms)  SELECT COUNT(*) FROM "sub_menu_items"  WHERE "sub_menu_items"."menu_item_id" = $1  [["menu_item_id", 4]]
+ (0.9ms)  SELECT COUNT(*) FROM "sub_menu_items"  WHERE "sub_menu_items"."menu_item_id" = $1  [["menu_item_id", 5]]
+ (9.3ms)  SELECT COUNT(*) FROM "sub_menu_items"  WHERE "sub_menu_items"."menu_item_id" = $1  [["menu_item_id", 6]]
+ (0.9ms)  SELECT COUNT(*) FROM "sub_menu_items"  WHERE "sub_menu_items"."menu_item_id" = $1  [["menu_item_id", 7]]
+ (0.6ms)  SELECT COUNT(*) FROM "sub_menu_items"  WHERE "sub_menu_items"."menu_item_id" = $1  [["menu_item_id", 8]]
+ (0.5ms)  SELECT COUNT(*) FROM "sub_menu_items"  WHERE "sub_menu_items"."menu_item_id" = $1  [["menu_item_id", 9]]
+ (0.8ms)  SELECT COUNT(*) FROM "sub_menu_items"  WHERE "sub_menu_items"."menu_item_id" = $1  [["menu_item_id", 10]]
+ (0.5ms)  SELECT COUNT(*) FROM "sub_menu_items"  WHERE "sub_menu_items"."menu_item_id" = $1  [["menu_item_id", 11]]
+ (0.6ms)  SELECT COUNT(*) FROM "sub_menu_items"  WHERE "sub_menu_items"."menu_item_id" = $1  [["menu_item_id", 12]]
+</code></pre></div></div>
+<p>通过分析发现只需要把<strong>app/views/admin/menu_items/index.html.haml</strong>文件中的<code class="language-plaintext highlighter-rouge">%td= menu.sub_menu_items.count</code>改成<code class="language-plaintext highlighter-rouge">%td= menu.sub_menu_items.size</code>后就可以避免类似的N+1查询问题，修改之后的log会干净许多</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>MenuItem Load (2.9ms)  SELECT "menu_items".* FROM "menu_items"   ORDER BY menu_items.position ASC
+SubMenuItem Load (2.8ms)  SELECT "sub_menu_items".* FROM "sub_menu_items"  WHERE "sub_menu_items"."menu_item_id" IN (1, 2, 3, 13, 4, 5, 6, 7, 8, 9, 10, 11, 12)  ORDER BY sub_menu_items.position ASC
+</code></pre></div></div>
+<p>原因其实很简单，你也许可能猜出来。<code class="language-plaintext highlighter-rouge">count</code>会产生一次<code class="language-plaintext highlighter-rouge">count sql</code>。而<code class="language-plaintext highlighter-rouge">size</code>获得数组的大小。</p>
+
+<p>我们再看看它们的源码：</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>menu.sub_menu_items.method(:size).source.display
+</code></pre></div></div>
+<p>输出</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>def size
+  loaded? ? @records.length : count(:all)
+end
+</code></pre></div></div>
+<p>看起来调用了<code class="language-plaintext highlighter-rouge">length</code>方法，我们继续看看<code class="language-plaintext highlighter-rouge">length</code>是如何实现的</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>menu.sub_menu_items.method(:length).source.display
+
+</code></pre></div></div>
+<p>输出</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    delegate :to_xml, :encode_with, :length, :each, :join,
+             :[], :&amp;, :|, :+, :-, :sample, :reverse, :rotate, :compact, :in_groups, :in_groups_of,
+             :to_sentence, :to_formatted_s, :as_json,
+             :shuffle, :split, :slice, :index, :rindex, to: :records
+</code></pre></div></div>
+<p>可见调用<code class="language-plaintext highlighter-rouge">length</code>会被转发到<code class="language-plaintext highlighter-rouge">records</code>这个数组的<code class="language-plaintext highlighter-rouge">length</code>的调用.</p>
+
+<p><code class="language-plaintext highlighter-rouge">count</code>其实上最后调用<code class="language-plaintext highlighter-rouge">build_count_subquery</code>，去查询数据库。它的源码是</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>def build_count_subquery(relation, column_name, distinct)
+  if column_name == :all
+    column_alias = Arel.star
+    relation.select_values = [ Arel.sql(FinderMethods::ONE_AS_ONE) ] unless distinct
+  else
+    column_alias = Arel.sql("count_column")
+    relation.select_values = [ aggregate_column(column_name).as(column_alias) ]
+  end
+
+  subquery_alias = Arel.sql("subquery_for_count")
+  select_value = operation_over_aggregate_column(column_alias, "count", false)
+
+  relation.build_subquery(subquery_alias, select_value)
+end
+</code></pre></div></div>
+
+  </div><a class="u-url" href="/rails/2015/09/11/use-size-but-count-to-avoid-n-plus-1-query-in-has-many-relationship.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Andrew&#39;s Blog</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Andrew&#39;s Blog</li><li><a class="u-email" href="mailto:zzcv20051122@126.com">zzcv20051122@126.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/yyandrew"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">yyandrew</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>A Rubyist&#39;s Blog.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

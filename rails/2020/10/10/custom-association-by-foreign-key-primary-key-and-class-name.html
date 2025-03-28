@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>使用foreign_key, primary_key及class_name设置关联关系 | Andrew’s Blog</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="使用foreign_key, primary_key及class_name设置关联关系" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="首先看看我们用到的三个选项：" />
+<meta property="og:description" content="首先看看我们用到的三个选项：" />
+<link rel="canonical" href="https://blog.ky2020.store/rails/2020/10/10/custom-association-by-foreign-key-primary-key-and-class-name.html" />
+<meta property="og:url" content="https://blog.ky2020.store/rails/2020/10/10/custom-association-by-foreign-key-primary-key-and-class-name.html" />
+<meta property="og:site_name" content="Andrew’s Blog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-10-10T08:41:00+00:00" />
+<script type="application/ld+json">
+{"description":"首先看看我们用到的三个选项：","headline":"使用foreign_key, primary_key及class_name设置关联关系","dateModified":"2020-10-10T08:41:00+00:00","url":"https://blog.ky2020.store/rails/2020/10/10/custom-association-by-foreign-key-primary-key-and-class-name.html","datePublished":"2020-10-10T08:41:00+00:00","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://blog.ky2020.store/rails/2020/10/10/custom-association-by-foreign-key-primary-key-and-class-name.html"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://blog.ky2020.store/feed.xml" title="Andrew's Blog" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Andrew&#39;s Blog</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about.html">关于我</a><a class="page-link" href="/projects.html">项目列表</a><a class="page-link" href="/toolbox.html">工具箱</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">使用foreign_key, primary_key及class_name设置关联关系</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2020-10-10T08:41:00+00:00" itemprop="datePublished">Oct 10, 2020
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p>首先看看我们用到的三个选项：</p>
+
+<ol>
+  <li>foreign_key - 设定要使用的外键名。按照约定ActiveRecord会使用模型名加<code class="language-plaintext highlighter-rouge">_id</code>这种格式去猜foreign_key，比如<code class="language-plaintext highlighter-rouge">UserServiceAccess</code>里有<code class="language-plaintext highlighter-rouge">has_one</code>关系，ActiveRecord会使用<code class="language-plaintext highlighter-rouge">user_service_access_id</code>为外键名。</li>
+  <li>primary_key -  设定主键值。按照约定ActiveRecord会使用<code class="language-plaintext highlighter-rouge">user_service_access.id</code>为主键值。</li>
+  <li>class_name - 如果另一个模型无法从关联的名称获取，可以用它来设定模型。比如下面的例子设定了<code class="language-plaintext highlighter-rouge">has_one current_user_service_access_offer</code>,ActiveRecord会使用<code class="language-plaintext highlighter-rouge">CurrentUserServiceAccessOffer</code>为模型名。</li>
+</ol>
+
+<p>涉及到的模型</p>
+
+<ul>
+  <li>UserServiceAccess</li>
+</ul>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">UserServiceAccess</span> <span class="o">&lt;</span> <span class="no">ApplicationRecord</span>
+  <span class="n">has_one</span> <span class="ss">:current_user_service_access_offer</span><span class="p">,</span> <span class="ss">foreign_key: :id</span><span class="p">,</span> <span class="ss">primary_key: :current_offer_id</span><span class="p">,</span> <span class="ss">class_name: </span><span class="s1">'UserServiceAccessOffer'</span>
+<span class="k">end</span>
+<span class="c1"># == Schema Information</span>
+<span class="c1">#</span>
+<span class="c1"># Table name: user_service_access</span>
+<span class="c1">#</span>
+<span class="c1">#  id                    :integer          not null, primary key</span>
+<span class="c1">#  current_offer_id      :integer</span>
+</code></pre></div></div>
+
+<ul>
+  <li>UserServiceAccessOffer</li>
+</ul>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">UserServiceAccessOffer</span> <span class="o">&lt;</span> <span class="no">ApplicationRecord</span>
+<span class="k">end</span>
+<span class="c1"># == Schema Information</span>
+<span class="c1">#</span>
+<span class="c1"># Table name: user_service_access_offer</span>
+<span class="c1">#</span>
+<span class="c1">#  id                                   :integer          not null, primary key</span>
+</code></pre></div></div>
+
+<p>测试</p>
+
+<pre><code class="language-shell ">[34] pry(main)&gt; usa = UserServiceAccess.first  
+[36] pry(main)&gt; usa.current_offer_id                                                     
+=&gt; 144   
+[37] pry(main)&gt; usa.current_user_service_access_offer
+  UserServiceAccessOffer Load (0.4ms)  SELECT `user_service_access_offer`.* FROM `user_service_access_offer` WHERE `user_service_access_offer`.`deactivated_at` IS NULL AND `user_service_access_offer`.`id` = 144 LIMIT 1 
+</code></pre>
+
+<p>从上面的测试可以看到<code class="language-plaintext highlighter-rouge">UserServiceAccess</code>的<code class="language-plaintext highlighter-rouge">current_offer_id</code>是<code class="language-plaintext highlighter-rouge">144</code>，查找它的<code class="language-plaintext highlighter-rouge">current_user_service_access_offer</code>产生的SQL也正确的使用的id<code class="language-plaintext highlighter-rouge">user_service_access_offer.id = 144</code>这个条件。</p>
+
+  </div><a class="u-url" href="/rails/2020/10/10/custom-association-by-foreign-key-primary-key-and-class-name.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Andrew&#39;s Blog</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Andrew&#39;s Blog</li><li><a class="u-email" href="mailto:zzcv20051122@126.com">zzcv20051122@126.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/yyandrew"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">yyandrew</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>A Rubyist&#39;s Blog.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

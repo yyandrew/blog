@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Rails自动加载运行机制之cache_classes | Andrew’s Blog</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="Rails自动加载运行机制之cache_classes" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="下面的源代码都是来自Rails 5.2.4.4。" />
+<meta property="og:description" content="下面的源代码都是来自Rails 5.2.4.4。" />
+<link rel="canonical" href="https://blog.ky2020.store/rails/2021/04/18/reload-mechanism-of-rails-1-cache-classes.html" />
+<meta property="og:url" content="https://blog.ky2020.store/rails/2021/04/18/reload-mechanism-of-rails-1-cache-classes.html" />
+<meta property="og:site_name" content="Andrew’s Blog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-04-18T04:52:00+00:00" />
+<script type="application/ld+json">
+{"description":"下面的源代码都是来自Rails 5.2.4.4。","headline":"Rails自动加载运行机制之cache_classes","dateModified":"2021-04-18T04:52:00+00:00","url":"https://blog.ky2020.store/rails/2021/04/18/reload-mechanism-of-rails-1-cache-classes.html","datePublished":"2021-04-18T04:52:00+00:00","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://blog.ky2020.store/rails/2021/04/18/reload-mechanism-of-rails-1-cache-classes.html"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://blog.ky2020.store/feed.xml" title="Andrew's Blog" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Andrew&#39;s Blog</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about.html">关于我</a><a class="page-link" href="/projects.html">项目列表</a><a class="page-link" href="/toolbox.html">工具箱</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Rails自动加载运行机制之cache_classes</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2021-04-18T04:52:00+00:00" itemprop="datePublished">Apr 18, 2021
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p>下面的源代码都是来自Rails 5.2.4.4。</p>
+
+<p>Rails是通过<code class="language-plaintext highlighter-rouge">cache_classes</code>和<code class="language-plaintext highlighter-rouge">reload_classes_only_on_change</code>配置(在development环境下默认是cache_classes为false，即开启自动加载；reload_classes_only_on_change为true)是否开启自动刷新代码功能。</p>
+
+<h3 id="cache_classes">cache_classes</h3>
+
+<p>通过搜索我们发现在<code class="language-plaintext highlighter-rouge">Rails::Application::DefaultMiddlewareStack</code>里面包含处理<code class="language-plaintext highlighter-rouge">config.cache_classes</code>的相应的代码。</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code>   <span class="k">unless</span> <span class="n">config</span><span class="p">.</span><span class="nf">cache_classes</span>
+        <span class="n">middleware</span><span class="p">.</span><span class="nf">use</span> <span class="o">::</span><span class="no">ActionDispatch</span><span class="o">::</span><span class="no">Reloader</span><span class="p">,</span> <span class="n">app</span><span class="p">.</span><span class="nf">reloader</span>
+   <span class="k">end</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">middleware</code>是<code class="language-plaintext highlighter-rouge">ActionDispatch::MiddlewareStack</code>实例。它的<code class="language-plaintext highlighter-rouge">use</code>方法如下：</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">use</span><span class="p">(</span><span class="n">klass</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">block</span><span class="p">)</span>
+  <span class="n">middlewares</span><span class="p">.</span><span class="nf">push</span><span class="p">(</span><span class="n">build_middleware</span><span class="p">(</span><span class="n">klass</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">block</span><span class="p">))</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">ActionDispatch::Reloader</code>是一个Rack middleware。它的作用是每当有代码修改发生自动更新代码，确保每个HTTP请求能够使用最新的代码，</p>
+
+<p><code class="language-plaintext highlighter-rouge">app.reloader</code>是<code class="language-plaintext highlighter-rouge">ActiveSupport::Reloader</code> 的子类。其赋值语句为：</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="vi">@reloader</span>          <span class="o">=</span> <span class="no">Class</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="no">ActiveSupport</span><span class="o">::</span><span class="no">Reloader</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>ps:使用<code class="language-plaintext highlighter-rouge">Class.new</code>可以创建一个匿名类，它的参数是这个匿名类的父类。它定义了一些callbacks。在自动更新代码时被调用执行。</p>
+
+<p>通过<code class="language-plaintext highlighter-rouge">middleware.use</code>方法使得middleware栈多了一个<code class="language-plaintext highlighter-rouge">::ActionDispatch::Reloade</code>的middleware。</p>
+
+<p>middleware有什么作用呢？middleware是位于客户端和服务端之间的组件，我们可以使用它来处理流入、流出的客户端请求数据或者服务端的响应数据。</p>
+
+<p>怎么自定义一个middleware?</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">MyMiddleware</span>
+  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
+    <span class="vi">@app</span> <span class="o">=</span> <span class="n">app</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
+    <span class="nb">puts</span> <span class="s2">"MiddlewareOne reporting in!"</span>
+    <span class="nb">puts</span> <span class="s2">"The app is </span><span class="si">#{</span><span class="vi">@app</span><span class="si">}</span><span class="s2">"</span>
+    <span class="n">status</span><span class="p">,</span> <span class="n">headers</span><span class="p">,</span> <span class="n">body</span> <span class="o">=</span> <span class="vi">@app</span><span class="p">.</span><span class="nf">call</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
+    <span class="p">[</span><span class="n">status</span><span class="p">,</span> <span class="n">headers</span><span class="p">,</span> <span class="n">body</span><span class="p">]</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>在<code class="language-plaintext highlighter-rouge">Rack</code>里使用middleware</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="sr">//</span> <span class="n">config</span><span class="p">.</span><span class="nf">ru</span>
+<span class="k">class</span> <span class="nc">HandleClass</span>
+  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">call</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
+    <span class="p">[</span><span class="mi">200</span><span class="p">,</span> <span class="p">{</span> <span class="s1">'Content-Type'</span> <span class="o">=&gt;</span> <span class="s1">'text/html'</span><span class="p">},</span> <span class="p">[</span><span class="s1">'Hello middle'</span><span class="p">]]</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+<span class="n">use</span> <span class="no">MyMiddleware</span>
+<span class="n">run</span> <span class="no">HandleClass</span>
+</code></pre></div></div>
+
+<p>使用命令<code class="language-plaintext highlighter-rouge">rackup config.ru</code>运行<code class="language-plaintext highlighter-rouge">config.ru</code>，启动WEBrick服务器。访问http://127.0.0.1:9292.。可以看到日志输出类似：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>MiddlewareOne reporting in!
+The app is HandleClass
+</code></pre></div></div>
+
+<p>说明我们的middleware起作用了。</p>
+
+<p>总结：</p>
+
+<ol>
+  <li><code class="language-plaintext highlighter-rouge">ActionDispatch::MiddlewareStack#use</code>可以向middleware栈添加新的middleware；</li>
+  <li>如果<code class="language-plaintext highlighter-rouge">cache_classes</code>为<code class="language-plaintext highlighter-rouge">false</code>时<code class="language-plaintext highlighter-rouge">ActiveSupport::Reloader</code>这个middleware会被添加到middleware栈里；</li>
+  <li>使用<code class="language-plaintext highlighter-rouge">Class.new</code>可以创建一个匿名类，它的参数是这个匿名类的父类；</li>
+  <li>middleware是位于客户端和服务端之间的组件，我们可以用它来处理请求或者响应数据；</li>
+  <li>使用Rack可以开发web应用。<code class="language-plaintext highlighter-rouge">rackup</code>命令可以运行Rack应用。</li>
+</ol>
+
+  </div><a class="u-url" href="/rails/2021/04/18/reload-mechanism-of-rails-1-cache-classes.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Andrew&#39;s Blog</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Andrew&#39;s Blog</li><li><a class="u-email" href="mailto:zzcv20051122@126.com">zzcv20051122@126.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/yyandrew"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">yyandrew</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>A Rubyist&#39;s Blog.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

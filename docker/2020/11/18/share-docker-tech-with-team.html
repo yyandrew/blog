@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>团队分享Docker技术演讲草稿 | Andrew’s Blog</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="团队分享Docker技术演讲草稿" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="如何使用Docker搭建Rails开发环境" />
+<meta property="og:description" content="如何使用Docker搭建Rails开发环境" />
+<link rel="canonical" href="https://blog.ky2020.store/docker/2020/11/18/share-docker-tech-with-team.html" />
+<meta property="og:url" content="https://blog.ky2020.store/docker/2020/11/18/share-docker-tech-with-team.html" />
+<meta property="og:site_name" content="Andrew’s Blog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-11-18T09:24:00+00:00" />
+<script type="application/ld+json">
+{"description":"如何使用Docker搭建Rails开发环境","headline":"团队分享Docker技术演讲草稿","dateModified":"2020-11-18T09:24:00+00:00","url":"https://blog.ky2020.store/docker/2020/11/18/share-docker-tech-with-team.html","datePublished":"2020-11-18T09:24:00+00:00","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://blog.ky2020.store/docker/2020/11/18/share-docker-tech-with-team.html"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://blog.ky2020.store/feed.xml" title="Andrew's Blog" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Andrew&#39;s Blog</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about.html">关于我</a><a class="page-link" href="/projects.html">项目列表</a><a class="page-link" href="/toolbox.html">工具箱</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">团队分享Docker技术演讲草稿</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2020-11-18T09:24:00+00:00" itemprop="datePublished">Nov 18, 2020
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <h2 id="如何使用docker搭建rails开发环境">如何使用Docker搭建Rails开发环境</h2>
+
+<h3 id="第0页">第0页</h3>
+
+<p><img src="/images/docker-rails-page-0.png" alt="docker-rails-page-0.png" /></p>
+
+<p>这次Workshop的主要内容有</p>
+<ol>
+  <li>介绍什么是Docker</li>
+  <li>怎么使用Docker</li>
+  <li>怎么使用Dockerfile定制镜像</li>
+  <li>介绍Docker Compose</li>
+  <li>操作演示。从零开始搭建Rails开发环境</li>
+</ol>
+
+<h2 id="第1页">第1页</h2>
+
+<p><img src="/images/docker-rails-page-1.png" alt="docker-rails-page-1.png" />
+首先大家要明白Docker只是一个工具。Docker通过将应用程序运行时所需析软件及资源打包到容器里来简化我们创建，部署，运行应用的工作。</p>
+
+<h3 id="第2页">第2页</h3>
+
+<p><img src="/images/architecture-of-docker.png" alt="architecture-of-docker.png" /></p>
+
+<p>Docker的结构
+Docker使用典型的C/S结构。客户端发送docker指令，Docker daemon监听指令请求，对请求作反应。比如管理镜像，容器，网络，匿名卷等。</p>
+
+<p>这张图包含了一些Docker的基本概念：</p>
+<ol>
+  <li>镜像 - Docker镜像是一个特殊的文件系统除了提供容器运行时所需的程序、资源、配置文件 外，还包含了一些运行时准备的一些配置参数(如环境变量、用户等)。镜像不包含任何动态数据、其内容构建之后不会被改变。</li>
+  <li>容器 - 容器是镜像运行时的实体。容器可以被创建、启动、停止、删除暂停等。镜像和容器的关系就像程序和进程的关系。</li>
+  <li>仓库 - 镜像构建完成之后，可以很容易的在当前宿主机上运行。但是需要在其它的服务器上使用这个镜像，我们就需要一个集中的存储、分发镜像的服务。Docker registry就是这样的服务。一个Docker Registry中可以有多个仓库，每个仓库可以有多个标签，每个标签对应一个镜像。</li>
+</ol>
+
+<h3 id="第3页">第3页</h3>
+
+<p><img src="/images/connect-each-component-of-docker.png" alt="connect-each-component-of-docker.png" /></p>
+
+<p>接下来我们通过一个例子讲解一下各个组件如何协同工作。
+以<code class="language-plaintext highlighter-rouge">docker run</code>为例子，当你运行这条命令的时候，docker究竟做了哪些事？
+首先，Docker会将我们需要的镜像准备好。在这个例子里镜像是nginx
+接下来创建一个容器。
+然后是为这个容器分配文件系统以便用户可以访问容器里的文件。
+再接下来是为容器分配网络接口，这样容器就可以和外界通信了。
+最后是启动容器并且运行<code class="language-plaintext highlighter-rouge">bash</code>命令。这条命令之后我们就可以使用控制台终端和容器交互了。</p>
+
+<h3 id="第4页">第4页</h3>
+
+<p><img src="/images/how-to-use-docker.png" alt="how-to-use-docker.png " /></p>
+
+<p>这一页展示了如何使用Docker搭建一个Nginx服务器。同时也展示了Docker的完整的生命周期。
+第一步使用docker pull下载nginx镜像
+第二步使用docker run运行镜像。-p表示宿主机和容器端口的映射关系。这里80:80表示将容器的80端口映射到宿主机的80端口。-v表示创建一个共享目录，以便宿主机和容器进行文件共享。-w表示设置一个工作目录。–name表示为容器指定一个名字，便于记忆。最后的一个值nginx表示使用哪个镜像。这里是nginx。
+第三步使用curl命令测试。
+第四步打开控制台终端等待用户输入命令和容器进行交互。
+第五步删除容器
+第六步删除镜像</p>
+
+<h3 id="第5页">第5页</h3>
+<p><img src="/images/whats-dockerfile.png" alt="whats-dockerfile.png" />
+下面我们介绍一下Dockerfile</p>
+
+<p>Dockerfile 是一个文本文件，其内包含了一条条的指令(Instruction)，这些指令描述了镜像的创建过程。</p>
+
+<p>使用 Dockerfile 使镜像构建文档化，不仅仅开发团队可以理解应用运行环境，也方便运维团队理解应用运行所需条件，帮助他们更好的在生产环境中部署该镜像。</p>
+
+<h3 id="第6页">第6页</h3>
+<p><img src="/images/how-to-build-rails-image.png" alt="how-to-build-rails-image.png" /></p>
+
+<p>以定制Rails开发环境镜像为例子。</p>
+<ol>
+  <li>FROM 指定基础镜像</li>
+  <li>RUN 指令是用来执行命令行命令</li>
+  <li>WORKDIR 指定工作目录（或者称为当前目录）</li>
+  <li>COPY 复制文件。格式为<code class="language-plaintext highlighter-rouge">COPY &lt;宿主机源路径&gt;... &lt;镜像内目标路径&gt;</code></li>
+  <li>EXPOSE 指令是声明运行时容器提供服务端口</li>
+  <li>CMD 指令就是用于指定默认的容器主进程的启动命令的。由于Docker 不是虚拟机，容器就是进程。既然是进程，那么在启动容器的时候，需要指定所运行的程序及参数。</li>
+</ol>
+
+<h3 id="第7页">第7页</h3>
+<p><img src="/images/introduce-docker-compose.png" alt="introduce-docker-compose.png" />
+Docker Compose是Docker官方编排工具之一，可以通过它定义多容器docker应用</p>
+
+<h3 id="第8页">第8页</h3>
+
+<p><img src="/images/introduce-docker-compose-yml.png" alt="introduce-docker-compose-yml.png" /></p>
+
+<p>模板文件是使用 Compose 的核心，涉及到的指令关键字也比较多。但大家不用担心，这里面大部分指令跟docker run 相关参数的含义都是类似的。</p>
+
+<p>每个服务都必须通过 image 指令指定镜像或 build 指令（需要 Dockerfile）等来自动构建生成镜像。</p>
+
+<ol>
+  <li>build 指定 Dockerfile 所在文件夹的路径</li>
+  <li>ports 暴露端口信息。使用宿主端口：容器端口 (HOST:CONTAINER) 格式</li>
+  <li>volumes 数据卷所挂载路径设置。可以设置为宿主机路径(HOST:CONTAINER)</li>
+  <li>depends_on 解决容器的依赖、启动先后的问题。以下例子中会先启动postgres再启动web。</li>
+</ol>
+
+<h3 id="第9页">第9页</h3>
+<p><img src="/images/practice-of-dockerize-rails-app.png" alt="practice-of-dockerize-rails-app.png" /></p>
+
+<p>使用Docker创建一个Rails API，并添加一个users的endpoint。
+要求：</p>
+
+<ol>
+  <li>数据库用postgres:9.6-alpine（体积小，下载速度快）</li>
+  <li>使用docker-compose编排服务</li>
+</ol>
+
+<p>只有20分钟练习。</p>
+
+<p>详细的操作说明可以查看<a href="https://github.com/yyandrew/dockerize-rails-app/tree/14e84e49c88bd9d162b75bbfe16e2903797b5f9b">github repo</a></p>
+
+
+  </div><a class="u-url" href="/docker/2020/11/18/share-docker-tech-with-team.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Andrew&#39;s Blog</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Andrew&#39;s Blog</li><li><a class="u-email" href="mailto:zzcv20051122@126.com">zzcv20051122@126.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/yyandrew"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">yyandrew</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>A Rubyist&#39;s Blog.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>使用webpack和babel配置ReactJS开发环境 | Andrew’s Blog</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="使用webpack和babel配置ReactJS开发环境" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="什么是ReactJS" />
+<meta property="og:description" content="什么是ReactJS" />
+<link rel="canonical" href="https://blog.ky2020.store/react.js/2018/09/24/minimal-react-environment-with-webpack-and-babel.html" />
+<meta property="og:url" content="https://blog.ky2020.store/react.js/2018/09/24/minimal-react-environment-with-webpack-and-babel.html" />
+<meta property="og:site_name" content="Andrew’s Blog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2018-09-24T06:24:05+00:00" />
+<script type="application/ld+json">
+{"description":"什么是ReactJS","headline":"使用webpack和babel配置ReactJS开发环境","dateModified":"2018-09-24T06:24:05+00:00","url":"https://blog.ky2020.store/react.js/2018/09/24/minimal-react-environment-with-webpack-and-babel.html","datePublished":"2018-09-24T06:24:05+00:00","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://blog.ky2020.store/react.js/2018/09/24/minimal-react-environment-with-webpack-and-babel.html"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://blog.ky2020.store/feed.xml" title="Andrew's Blog" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Andrew&#39;s Blog</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about.html">关于我</a><a class="page-link" href="/projects.html">项目列表</a><a class="page-link" href="/toolbox.html">工具箱</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">使用webpack和babel配置ReactJS开发环境</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2018-09-24T06:24:05+00:00" itemprop="datePublished">Sep 24, 2018
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <h3 id="什么是reactjs"><a href="https://reactjs.org.cn/">什么是ReactJS</a></h3>
+
+<p>它是由Facebook开源的用来构建用户界面的JavaScript库。它采用虚拟DOM机制向DOM填充数据。更新单独的虚拟DOM组件比更新整个DOM树要快。</p>
+
+<h3 id="什么是webpack"><a href="https://www.webpackjs.com/">什么是Webpack</a></h3>
+
+<p>它是一个模块打包工具。它的主要目标是将JavaScript文件打包在一起之后在浏览器中使用。同时它还可以用来转换(transform)。</p>
+
+<h3 id="什么是babel"><a href="https://www.babeljs.cn/">什么是Babel</a></h3>
+
+<p>语法转换工具。将最新的JavaScript语法转换成浏览器支持的语法，无需等到浏览器支持这些最新的语法。</p>
+
+<h3 id="创建一个reactjs项目">创建一个ReactJS项目</h3>
+<p>一、 创建一个新的项目目录，及基本的文件。</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">mkdir </span>reactjs-demo
+<span class="nb">cd </span>reactjs-demo
+npm init <span class="nt">-y</span>
+<span class="nb">mkdir </span>dist
+<span class="nb">cd </span>dist
+</code></pre></div></div>
+<p>二、 新建一个<code class="language-plaintext highlighter-rouge">dist/index.html</code>文件</p>
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;html</span> <span class="na">lang=</span><span class="s">"en"</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;head&gt;</span>
+    <span class="nt">&lt;meta</span> <span class="na">charset=</span><span class="s">"UTF-8"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;meta</span> <span class="na">name=</span><span class="s">"viewport"</span> <span class="na">content=</span><span class="s">"width=device-width, initial-scale=1.0"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;title&gt;</span>ReactJS示例<span class="nt">&lt;/title&gt;</span>
+  <span class="nt">&lt;/head&gt;</span>
+
+  <span class="nt">&lt;body&gt;</span>
+    <span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">"app"</span><span class="nt">&gt;&lt;/div&gt;</span>
+    <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"/bundle.js"</span><span class="nt">&gt;&lt;/script&gt;</span>
+  <span class="nt">&lt;/body&gt;</span>
+<span class="nt">&lt;/html&gt;</span>
+</code></pre></div></div>
+
+<p>其中<code class="language-plaintext highlighter-rouge">bundle.js</code>是由<code class="language-plaintext highlighter-rouge">Webpack</code>产生的一个打包文件。</p>
+
+<p>此时项目的目录结构为:</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+├── dist
+│   └── index.html
+└── package.json
+</code></pre></div></div>
+
+<h3 id="配置webpack">配置Webpack</h3>
+<p>一、安装Webpack</p>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>npm <span class="nb">install</span> <span class="nt">--save-dev</span> webpack webpack-dev-server webpack-cli
+</code></pre></div></div>
+<p>二、修改<code class="language-plaintext highlighter-rouge">package.json</code></p>
+<pre><code class="language-JavaScript">...
+"scripts": {
+  "start": "webpack-dev-server --config ./webpack.config.js --mode development",
+  ...
+},
+...
+</code></pre>
+<p>三、新建<code class="language-plaintext highlighter-rouge">webpack.config.js</code>文件</p>
+<pre><code class="language-JavaScript">module.exports = {
+  entry: './src/index.js',
+  output: {
+    path: __dirname + '/dist',
+    publicPath: '/',
+    filename: 'bundle.js'
+  },
+  devServer: {
+    contentBase: './dist'
+  }
+}
+</code></pre>
+
+<p>其中<code class="language-plaintext highlighter-rouge">entry</code>是入口起点，它指示webpack应该使用哪个模块，来作为构建其内部依赖图的开始。<code class="language-plaintext highlighter-rouge">output</code>告诉webpack在哪里输出它所创建的打包文件。<code class="language-plaintext highlighter-rouge">devServer</code>指定<code class="language-plaintext highlighter-rouge">dist</code>文件夹为资源文件夹。</p>
+
+<p>四、创建<code class="language-plaintext highlighter-rouge">src/index.js</code>文件</p>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">mkdir </span>src
+<span class="nb">cd </span>src
+<span class="nb">touch </span>index.js
+</code></pre></div></div>
+<p><code class="language-plaintext highlighter-rouge">src/index.js</code>的内容</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>console.log('ReactJS示例');
+</code></pre></div></div>
+<p>此时的目录结构为：</p>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>├── dist
+│   └── index.html
+├── node_modules
+├── package.json
+├── package-lock.json
+├── src
+│   └── index.js
+└── webpack.config.js
+</code></pre></div></div>
+
+<p>五、启动项目
+    <code class="language-plaintext highlighter-rouge">sh
+    npm start
+   </code></p>
+
+<p>六、在浏览器中打开<a href="http://localhost:8080">http://localhost:8080</a>，不出意外此时在浏览器的console里会打印出<code class="language-plaintext highlighter-rouge">ReactJS示例</code>。</p>
+
+<h3 id="配置babel">配置Babel</h3>
+
+<p>一、安装依赖包</p>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>npm <span class="nb">install</span> <span class="nt">--save-dev</span> @babel/core @babel/preset-env babel-loader @babel/preset-react
+</code></pre></div></div>
+<p>二、修改文件<code class="language-plaintext highlighter-rouge">webpack.config.js</code>内容</p>
+<pre><code class="language-JavaScript">...
+entry: './src/index.js',
+module: {
+  rules: [
+    {
+      test: /\.(js|jsx)$/,
+      exclude: /node_modules/,
+      use: ['babel-loader']
+    }
+  ]
+},
+resolve: {
+  extensions: ['*', '.js', '.jsx']
+},
+...
+</code></pre>
+<p>三、在项目根目录下创建新文件<code class="language-plaintext highlighter-rouge">.babelrc</code></p>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">touch</span> .babelrc
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">.babelrc</code>文件内容如下：</p>
+
+<pre><code class="language-JavaScript">{
+  "presets": [
+    "@babel/preset-env",
+    "@babel/preset-react"
+  ]
+}
+</code></pre>
+
+<h3 id="使用reactjs">使用ReactJS</h3>
+
+<p>一、在项目根目录下安装如下依赖</p>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>npm <span class="nb">install</span> <span class="nt">--save</span> react react-dom
+</code></pre></div></div>
+<p>二、修改<code class="language-plaintext highlighter-rouge">webpack.config.js</code>配置自动刷新浏览器</p>
+<pre><code class="language-JavaScript">var webpack = require('webpack')
+...
+plugins: [
+  new webpack.HotModuleReplacementPlugin()
+],
+devServer: {
+  ...
+  hot: true
+}
+...
+</code></pre>
+<p>三、修改文件<code class="language-plaintext highlighter-rouge">src/index.js</code>内容使用ReactJS</p>
+<pre><code class="language-JavaScript">import React from 'react';
+import ReactDOM from 'react-dom';
+
+const title = 'ReactJS示例';
+
+ReactDOM.render(
+  &lt;div&gt;{title}&lt;/div&gt;,
+  document.getElementById('app')
+)
+</code></pre>
+
+<p><a href="https://github.com/yyandrew/minimal_react_environment_by_webpack_and_babel">项目完整代码</a></p>
+
+  </div><a class="u-url" href="/react.js/2018/09/24/minimal-react-environment-with-webpack-and-babel.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Andrew&#39;s Blog</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Andrew&#39;s Blog</li><li><a class="u-email" href="mailto:zzcv20051122@126.com">zzcv20051122@126.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/yyandrew"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">yyandrew</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>A Rubyist&#39;s Blog.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

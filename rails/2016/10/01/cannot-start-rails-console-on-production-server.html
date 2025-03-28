@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>cannot start rails console on production server | Andrew’s Blog</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="cannot start rails console on production server" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="最近部署新项目到生产环境后，运行bundle exec rails c -e production 出现下面错误" />
+<meta property="og:description" content="最近部署新项目到生产环境后，运行bundle exec rails c -e production 出现下面错误" />
+<link rel="canonical" href="https://blog.ky2020.store/rails/2016/10/01/cannot-start-rails-console-on-production-server.html" />
+<meta property="og:url" content="https://blog.ky2020.store/rails/2016/10/01/cannot-start-rails-console-on-production-server.html" />
+<meta property="og:site_name" content="Andrew’s Blog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2016-10-01T23:21:37+00:00" />
+<script type="application/ld+json">
+{"description":"最近部署新项目到生产环境后，运行bundle exec rails c -e production 出现下面错误","headline":"cannot start rails console on production server","dateModified":"2016-10-01T23:21:37+00:00","url":"https://blog.ky2020.store/rails/2016/10/01/cannot-start-rails-console-on-production-server.html","datePublished":"2016-10-01T23:21:37+00:00","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://blog.ky2020.store/rails/2016/10/01/cannot-start-rails-console-on-production-server.html"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://blog.ky2020.store/feed.xml" title="Andrew's Blog" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Andrew&#39;s Blog</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about.html">关于我</a><a class="page-link" href="/projects.html">项目列表</a><a class="page-link" href="/toolbox.html">工具箱</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">cannot start rails console on production server</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2016-10-01T23:21:37+00:00" itemprop="datePublished">Oct 1, 2016
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p>最近部署新项目到生产环境后，运行<code class="language-plaintext highlighter-rouge">bundle exec rails c -e production</code>
+出现下面错误</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Usage:
+  rails new APP_PATH <span class="o">[</span>options]
+
+Options:
+  <span class="nt">-r</span>, <span class="o">[</span><span class="nt">--ruby</span><span class="o">=</span>PATH]                                      <span class="c"># Path to the Ruby binary     of your choice</span>
+
+..... yada yada, shows the rest of the rails options <span class="o">(</span>oddly enough does not show <span class="s1">'c'</span> or <span class="s1">'console'</span> as options?<span class="o">)</span>
+</code></pre></div></div>
+<p>capistrano的版本</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>cap -V # Capistrano Version: 3.6.1 (Rake Version: 11.3.0)
+</code></pre></div></div>
+
+<p>生产环境</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>rvm -v # rvm 1.26.11 (latest) by Wayne E. Seguin &lt;wayneeseguin@gmail.com&gt;, Michal Papis &lt;mpapis@gmail.com&gt; [https://rvm.io/]
+bundle exec rails -v # Rails 5.0.0.1
+</code></pre></div></div>
+
+<p>经过google发现这个问题是因为<code class="language-plaintext highlighter-rouge">current</code>目录下没有’bin/rails’造成的。</p>
+
+<p>难道是<code class="language-plaintext highlighter-rouge">.gitignore</code>文件设置了忽略了<code class="language-plaintext highlighter-rouge">bin</code>文件夹？一检查，果然有</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>log/<span class="k">*</span>
+tmp/<span class="k">*</span>
+config/database.yml
+config/secrets.yml
+bin/<span class="k">*</span>
+.byebug_history
+<span class="k">*</span>.swp
+public/media/<span class="k">*</span>
+</code></pre></div></div>
+
+<p>没有什么好说的，先删掉<code class="language-plaintext highlighter-rouge">bin/*</code>行。
+接下来你也许还要检查一下你的<code class="language-plaintext highlighter-rouge">deploy.rb</code>文件<code class="language-plaintext highlighter-rouge">set :linked_dirs</code>是不是有<code class="language-plaintext highlighter-rouge">bin</code>的字样，如果有也请删除<code class="language-plaintext highlighter-rouge">bin</code></p>
+
+<ul>
+  <li>有问题的deploy.rb设置
+    <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">set</span> :linked_dirs, fetch<span class="o">(</span>:linked_dirs, <span class="o">[])</span>.push<span class="o">(</span><span class="s1">'bin'</span>, <span class="s1">'log'</span>, <span class="s1">'tmp/pids'</span>, <span class="s1">'tmp/cache'</span>, <span class="s1">'tmp/sockets'</span>, <span class="s1">'vendor/bundle'</span>, <span class="s1">'public/system'</span>, <span class="s1">'public/assets'</span>, <span class="s1">'public/media'</span><span class="o">)</span>
+</code></pre></div>    </div>
+  </li>
+  <li>修改后的deploy.rb设置
+    <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">set</span> :linked_dirs, fetch<span class="o">(</span>:linked_dirs, <span class="o">[])</span>.push<span class="o">(</span><span class="s1">'log'</span>, <span class="s1">'tmp/pids'</span>, <span class="s1">'tmp/cache'</span>, <span class="s1">'tmp/sockets'</span>, <span class="s1">'vendor/bundle'</span>, <span class="s1">'public/system'</span>, <span class="s1">'public/assets'</span>, <span class="s1">'public/media'</span><span class="o">)</span>
+</code></pre></div>    </div>
+  </li>
+</ul>
+
+<p>push代码之后，重新部署一下应该就没有问题了。</p>
+
+  </div><a class="u-url" href="/rails/2016/10/01/cannot-start-rails-console-on-production-server.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Andrew&#39;s Blog</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Andrew&#39;s Blog</li><li><a class="u-email" href="mailto:zzcv20051122@126.com">zzcv20051122@126.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/yyandrew"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">yyandrew</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>A Rubyist&#39;s Blog.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

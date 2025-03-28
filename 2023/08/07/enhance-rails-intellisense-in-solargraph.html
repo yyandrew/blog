@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>提升solargraph里的rails方法的智能提示 | Andrew’s Blog</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="提升solargraph里的rails方法的智能提示" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="环境 编辑器 Neovim Neovim 的 ruby lsp 客户端 solargraph v0.44.0" />
+<meta property="og:description" content="环境 编辑器 Neovim Neovim 的 ruby lsp 客户端 solargraph v0.44.0" />
+<link rel="canonical" href="https://blog.ky2020.store/2023/08/07/enhance-rails-intellisense-in-solargraph.html" />
+<meta property="og:url" content="https://blog.ky2020.store/2023/08/07/enhance-rails-intellisense-in-solargraph.html" />
+<meta property="og:site_name" content="Andrew’s Blog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2023-08-07T06:18:00+00:00" />
+<script type="application/ld+json">
+{"description":"环境 编辑器 Neovim Neovim 的 ruby lsp 客户端 solargraph v0.44.0","headline":"提升solargraph里的rails方法的智能提示","dateModified":"2023-08-07T06:18:00+00:00","url":"https://blog.ky2020.store/2023/08/07/enhance-rails-intellisense-in-solargraph.html","datePublished":"2023-08-07T06:18:00+00:00","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://blog.ky2020.store/2023/08/07/enhance-rails-intellisense-in-solargraph.html"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://blog.ky2020.store/feed.xml" title="Andrew's Blog" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Andrew&#39;s Blog</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about.html">关于我</a><a class="page-link" href="/projects.html">项目列表</a><a class="page-link" href="/toolbox.html">工具箱</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">提升solargraph里的rails方法的智能提示</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2023-08-07T06:18:00+00:00" itemprop="datePublished">Aug 7, 2023
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <h3 id="环境">环境</h3>
+<ol>
+  <li>编辑器 Neovim</li>
+  <li>Neovim 的 ruby lsp 客户端</li>
+  <li>solargraph v0.44.0</li>
+</ol>
+
+<h3 id="配置安装-neovim-的-ruby-lsp客户端">配置安装 Neovim 的 ruby lsp客户端</h3>
+<p>按照<a href="https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md#solargraph">官方文档</a>进行安装</p>
+<h3 id="安装-solargraph-gem">安装 solargraph gem</h3>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>gem install solargraph -v 0.44.0
+</code></pre></div></div>
+<h3 id="生成-ruby-的官方-api-的文档">生成 ruby 的官方 api 的文档</h3>
+<p>进入到 Rails 的项目，运行下面的命令</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>solargraph download-core
+</code></pre></div></div>
+<p>此时编辑器会提示 ruby 的内置方法的文档</p>
+<h3 id="生成-rails-文档">生成 Rails 文档</h3>
+<p>运行下面命令为当前 Rails 项目的各个插件生成文档</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bundle add yard # 将 yard 插件添加项目的 Gemfile 文件
+bundle exec yard gems
+</code></pre></div></div>
+<h3 id="添加配置文件使用-neovim-提示文档">添加配置文件使用 Neovim 提示文档</h3>
+<p>将 <a href="https://gist.github.com/castwide/28b349566a223dfb439a337aea29713e">https://gist.github.com/castwide/28b349566a223dfb439a337aea29713e</a> 保存到 Rails 项目的 rails.rb 文件中</p>
+
+<h3 id="如果还没有提示">如果还没有提示</h3>
+<p>可以尝试下面命令</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>solargraph clear # 清除之前的文档
+bundle exec yard gems --rebuild # 重新生成文档
+</code></pre></div></div>
+
+<p>参考链接</p>
+<ol>
+  <li>https://github.com/castwide/solargraph/issues/87</li>
+</ol>
+
+  </div><a class="u-url" href="/2023/08/07/enhance-rails-intellisense-in-solargraph.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Andrew&#39;s Blog</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Andrew&#39;s Blog</li><li><a class="u-email" href="mailto:zzcv20051122@126.com">zzcv20051122@126.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/yyandrew"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">yyandrew</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>A Rubyist&#39;s Blog.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

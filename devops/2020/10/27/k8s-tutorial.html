@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Kubernetes入门 | Andrew’s Blog</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="Kubernetes入门" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="什么是Kubernetes" />
+<meta property="og:description" content="什么是Kubernetes" />
+<link rel="canonical" href="https://blog.ky2020.store/devops/2020/10/27/k8s-tutorial.html" />
+<meta property="og:url" content="https://blog.ky2020.store/devops/2020/10/27/k8s-tutorial.html" />
+<meta property="og:site_name" content="Andrew’s Blog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-10-27T06:24:05+00:00" />
+<script type="application/ld+json">
+{"description":"什么是Kubernetes","headline":"Kubernetes入门","dateModified":"2020-10-27T06:24:05+00:00","url":"https://blog.ky2020.store/devops/2020/10/27/k8s-tutorial.html","datePublished":"2020-10-27T06:24:05+00:00","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://blog.ky2020.store/devops/2020/10/27/k8s-tutorial.html"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://blog.ky2020.store/feed.xml" title="Andrew's Blog" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Andrew&#39;s Blog</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about.html">关于我</a><a class="page-link" href="/projects.html">项目列表</a><a class="page-link" href="/toolbox.html">工具箱</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Kubernetes入门</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2020-10-27T06:24:05+00:00" itemprop="datePublished">Oct 27, 2020
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <h2 id="什么是kubernetes">什么是Kubernetes</h2>
+
+<p>Kubernets（简称K8s）是一个全新的基于容器技术的分布式架构领先方案。k8s具有完备的集群管理能力，包括多层次安全防护和准入机制、多租户应用支撑能力、透明的服务注册和服务发现机制、内建的智能负载均衡器、强大的故障发现和自我修复能力、服务滚动升级和在线扩容能力、可扩展的资源自动调试机制、以及多粒度资源配额管理能力。同时k8s提供了完善的管理工具，这些工具涵盖了包括开发、部署测试、运维监控在内的各个环节。因此，k8s是一个全新的基于容器技术的分布式架构解决方案，并且是一个一站式的完备的分布式系统开发和支撑平台。</p>
+
+<h2 id="为什么要用kubernetes">为什么要用Kubernetes</h2>
+
+<p>使用k8s的理由有很多，最重要的的理由是，IT行业从来都是由新技术驱动的。</p>
+
+<p>使用k8s收获的好处：</p>
+
+<ol>
+  <li>可以“轻装上阵”地开发复杂系统。采用k8s解决方案之后，只需要一名架构师负责系统中服务组件的架构设计，几名开发工程师负责业务代码的开发，一名系统兼运维工程师负责k8s的部署和运维。</li>
+  <li>可以全面拥抱微服务架构。</li>
+  <li>可以随时将系统整体“搬迁”到公有云上。</li>
+  <li>k8s内在的服务弹性扩容机制可以让我们轻松应对突发流量。在服务高峰期，我们可以选择在公有云中快速扩容某些service的实例副本以提升系统的吞吐量。</li>
+  <li>k8s系统架构超强的横向扩容能力可以让我们的竞争力大大提升。</li>
+</ol>
+
+<h2 id="基本概念和术语">基本概念和术语</h2>
+
+<h4 id="master">Master</h4>
+
+<p>k8s里的Master指的是集群控制节点，在每个k8s集群里都需要有一个Master来负责整个集群的管理和控制。</p>
+
+<p>在Master上运行着以下关键进程：</p>
+
+<ol>
+  <li>Kubernetes API Server：提供了HTTP Rest接口的关键服务进程，是k8s里所有资源的增、删、改、查等操作的唯一入口。</li>
+  <li>Kubernetes Controller Manager：k8s里所有资源对象的自动化控制中心，可以将其理解成资源对象的“大总管”</li>
+  <li>Kubernetes Scheduler：负责资源调度（Pod调度）的进程，相当于公交公司的“调度室”</li>
+</ol>
+
+<h4 id="node">Node</h4>
+
+<p>除了Master，k8s集群中的其他机器被称为Node。与master一样，Node可以是一台物理主机，也可以是一台虚拟机。每个Node被master分配一些工作负载（Docker容器），当某个Node宕机时，其上的工作负载会被master自动转移到其他节点上。</p>
+
+<p>在每个Node上都运行着以下关键进程：</p>
+
+<ol>
+  <li>kubelet：负责Pod对应的容器的创建、启动停等任务，同时与Master密切协作，实现集群管理的基本功能。</li>
+  <li>kube-proxy：实现k8s Service的通信与负载均衡机制的重要组件</li>
+  <li>Docker Engine：Docker引擎，负责本机的容器创建和管理工作。</li>
+</ol>
+
+<h4 id="pod">Pod</h4>
+
+<p>Pod是k8s最重要的概念。下图是Pod的组成示意图。</p>
+
+<p><img src="/images/pods-structure.png" alt="pods-structure.png" /></p>
+
+<p>我们可以看到每个Pod都有一个被称为“根容器”的Pause容器，除了Pause容器，每个Pod还包含一个或多个紧密相关的用户业务容器。</p>
+
+<p>Pod运行在一个被称为节点(Node)的环境中，这个节点既可以是物理机，也可以是私有云或者公有云中的一个虚拟机，通常在一个节点上可以运行几百个pod；其次，在每个pod中都运行着一个特殊的容器（被称作Pause容器）和其他的业务容器，这些业务容器共享Pause容器的网络栈和Volumn，因此它们之间的通信和数据交换更为高效，在设计时我们可以充分利用这一特性将一组密切相关的服务进程放入同一个pod中。</p>
+
+<h4 id="label">Label</h4>
+
+<p>一个Label是一个key=value的键值对，其中key与value是用户自己指定。label可以被附加各种资源对象上，例如Node、Pod、Service、RC等。</p>
+
+<h4 id="replication-controller">Replication Controller</h4>
+
+<p>RC是k8s系统的核心概念之一。简单的来说，它其实定义了一个期望的场景，即声明某种Pod的副本数量在任意时刻都符合某个预期值，所以RC的定义包括如下几个部分：</p>
+
+<ol>
+  <li>Pod期待的数量</li>
+  <li>用于筛选目标Pod的Label Selector</li>
+  <li>当Pod的副本数量小于预期数量时，用于创建新Pod的Pod模板。</li>
+</ol>
+
+<h4 id="deployment">Deployment</h4>
+
+<p>解决Pod的编排问题。是Replication Controller的一次升级，两者相似度超过90%</p>
+
+<h4 id="horizontal-pod-autoscaler">Horizontal Pod Autoscaler</h4>
+
+<p>k8s里的Pod智能扩容的特性。通过分析指定的RC控制的所有目标Pod的负载变化情况，来确定是否需要有针对性地调整目标 Pod的副本数量，这是HPA的实现原理。当前，HPA有以下两种方式作为Pod负载的度量指标：</p>
+
+<ol>
+  <li>CPUUtilizationPercentage - 目标Pod所有副本自身的CPU利用率的平均值。</li>
+  <li>程序自定义的试题指标，比如服务在每秒内的相应请求数（TPD或QPS）</li>
+</ol>
+
+<h4 id="service">Service</h4>
+
+<p>Service是分布式集群架构的核心，service的服务进程目前都基于Socket通信方式对外提供服务。一个service对象拥有如下关键特征：</p>
+
+<ol>
+  <li>拥有唯一的名称(比如my-nginx)</li>
+  <li>拥有一个虚拟IP（Cluster IP、Service IP或VIP）和端口号（比如192.168.49.2:32328）</li>
+  <li>能够提供某种远程服务能力（比如上面的deployment/my-ngin提供了Web Server服务）</li>
+  <li>被映射到提供这种服务能力的一组容器应用上（比如上面的deployment/my-ngin）</li>
+</ol>
+
+<p>下图显示了Pod，RC与Service的逻辑关系</p>
+
+<p><img src="/images/pod-rc-and-service.jpg" alt="pod-rc-and-service.jpg" /></p>
+
+<p>从上图可以看出k8s的Service定义了一个服务的访问入口地址，前端的应用（Pod）通过这个入口地址访问其背后的一组由Pod副本组成的集群实例，Service与其后端Pod副本集群之间则是通过Label Selector来实现无缝对接的。</p>
+
+<h4 id="volume">Volume</h4>
+
+<p>Volume是Pod中能够被多个容器访问的共享目录。</p>
+
+<h4 id="namespace">Namespace</h4>
+
+<p>Namespace在很多情况下用于实现多租户资源隔离。</p>
+
+<h2 id="从一个简单的例子开始">从一个简单的例子开始</h2>
+
+<p>下面是一个利用k8s部署一个nginx的例子。</p>
+
+<p>需要用到的工具：</p>
+
+<ol>
+  <li><a href="https://www.vagrantup.com/downloads">vagrant</a></li>
+  <li><a href="https://www.virtualbox.org/wiki/Downloads">virtualbox</a></li>
+</ol>
+
+<h4 id="通过vagrant安装虚拟机">通过vagrant安装虚拟机</h4>
+
+<p>下面所有的操作都会在这个虚拟机里执行。</p>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># -*- mode: ruby -*-</span>
+<span class="c1"># vi: set ft=ruby :</span>
+
+<span class="c1"># All Vagrant configuration is done below. The "2" in Vagrant.configure</span>
+<span class="c1"># configures the configuration version (we support older styles for</span>
+<span class="c1"># backwards compatibility). Please don't change it unless you know what</span>
+<span class="c1"># you're doing.</span>
+<span class="no">Vagrant</span><span class="p">.</span><span class="nf">configure</span><span class="p">(</span><span class="s2">"2"</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">config</span><span class="o">|</span>
+  <span class="n">config</span><span class="p">.</span><span class="nf">vm</span><span class="p">.</span><span class="nf">box</span> <span class="o">=</span> <span class="s2">"hashicorp/bionic64"</span>
+
+  <span class="n">config</span><span class="p">.</span><span class="nf">vm</span><span class="p">.</span><span class="nf">provider</span> <span class="s2">"virtualbox"</span> <span class="k">do</span> <span class="o">|</span><span class="n">vb</span><span class="o">|</span>
+    <span class="n">vb</span><span class="p">.</span><span class="nf">memory</span> <span class="o">=</span> <span class="s2">"4096"</span> <span class="c1"># kubernetes需要至少2GB内存</span>
+    <span class="n">vb</span><span class="p">.</span><span class="nf">cpus</span> <span class="o">=</span> <span class="mi">2</span> <span class="c1"># kubernetes需要至少2核CPU</span>
+  <span class="k">end</span>
+
+  <span class="n">config</span><span class="p">.</span><span class="nf">vm</span><span class="p">.</span><span class="nf">provision</span> <span class="s2">"shell"</span><span class="p">,</span> <span class="ss">inline: </span><span class="o">&lt;&lt;-</span><span class="no">SHELL</span><span class="sh">
+    apt-get update &amp;&amp; apt-get install -y apt-transport-https curl
+    # 安装docker
+    apt-get remove docker docker-engine docker.io containerd runc
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+    apt-key fingerprint 0EBFCD88
+    add-apt-repository \
+      "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+      $(lsb_release -cs) \
+      stable"
+    apt-get update
+    apt-get install -y docker-ce docker-ce-cli containerd.io
+    # 安装 kubeadm、kubelet 和 kubectl
+    curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
+    cat &lt;&lt;-EOF | tee /etc/apt/sources.list.d/kubernetes.list
+    deb https://apt.kubernetes.io/ kubernetes-xenial main
+EOF
+    apt-get update
+    apt-get install -y kubelet kubeadm kubectl
+    apt-mark hold kubelet kubeadm kubectl
+    # 安装minikube
+    curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube_latest_amd64.deb
+    dpkg -i minikube_latest_amd64.deb
+</span><span class="no">  SHELL</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<h4 id="启动构建环境并进入虚拟机">启动，构建环境并进入虚拟机</h4>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>vagrant up
+<span class="c"># vagrant provision</span>
+vagrant ssh
+</code></pre></div></div>
+
+<h4 id="配置kuberadmin">配置kuberadmin</h4>
+
+<p>用来创建kubernetes集群的工具。</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>swapoff <span class="nt">-a</span> <span class="c"># 关闭Swap分区，kubeadm不支持运行在为Swap分区的机器上</span>
+<span class="nb">sudo </span>kubeadm init
+<span class="nb">sudo cp</span> /etc/kubernetes/admin.conf <span class="nv">$HOME</span>/
+<span class="nb">sudo chown</span> <span class="si">$(</span><span class="nb">id</span> <span class="nt">-u</span><span class="si">)</span>:<span class="si">$(</span><span class="nb">id</span> <span class="nt">-g</span><span class="si">)</span> <span class="nv">$HOME</span>/admin.conf
+<span class="nb">export </span><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$HOME</span>/admin.conf
+</code></pre></div></div>
+
+<h4 id="启动minikube">启动minikube</h4>
+
+<p>使用minikube，你可以在本地轻松的搭建好kubernetes环境。</p>
+
+<pre><code class="language-sh ">sudo usermod -aG docker $USER &amp;&amp; newgrp docker
+minikube start --driver=docker
+minikube status # 查看是minikube否已经启动
+</code></pre>
+
+<p>如果输出如下内容表示minikube启动成功。</p>
+
+<p>PS：一定要注意看运行minikube的硬件要求（CPU，内存不满足要求的话会出错）</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>vagrant@vagrant:~$ minikube start --driver=docker
+* minikube v1.14.0 on Ubuntu 18.04 (vbox/amd64)
+* Using the docker driver based on existing profile
+
+X Requested memory allocation (985MB) is less than the recommended minimum 1907MB. Deployments may fail.
+
+* Starting control plane node minikube in cluster minikube
+* Restarting existing docker container for "minikube" ...
+* Preparing Kubernetes v1.19.2 on Docker 19.03.8 ...
+* Verifying Kubernetes components...
+* Enabled addons: default-storageclass, storage-provisioner
+* Done! kubectl is now configured to use "minikube" by default
+</code></pre></div></div>
+
+<h4 id="创建pods">创建Pods</h4>
+
+<p>一、新建一个文件<code class="language-plaintext highlighter-rouge">my-nginx-rc.yaml</code>，内容如下：</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">apps/v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">Deployment</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">my-nginx</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">selector</span><span class="pi">:</span>
+    <span class="na">matchLabels</span><span class="pi">:</span>
+      <span class="na">run</span><span class="pi">:</span> <span class="s">my-nginx</span>
+  <span class="na">replicas</span><span class="pi">:</span> <span class="m">2</span>
+  <span class="na">template</span><span class="pi">:</span>
+    <span class="na">metadata</span><span class="pi">:</span>
+      <span class="na">labels</span><span class="pi">:</span>
+        <span class="na">run</span><span class="pi">:</span> <span class="s">my-nginx</span>
+    <span class="na">spec</span><span class="pi">:</span>
+      <span class="na">containers</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">my-nginx</span>
+        <span class="na">image</span><span class="pi">:</span> <span class="s">nginx</span>
+        <span class="na">ports</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">containerPort</span><span class="pi">:</span> <span class="m">80</span>
+</code></pre></div></div>
+
+<p>上面是Deployment示例。其中创建了一个ReplicaSet，负责启动2个Pods。除此之外，该例子还：</p>
+
+<ol>
+  <li>创建名为<code class="language-plaintext highlighter-rouge">my-nginx</code>（由<code class="language-plaintext highlighter-rouge">metadata.name</code>指定）的Deployment</li>
+  <li>创建2个（由<code class="language-plaintext highlighter-rouge">spec.replicas</code>字段标明）Pod副本</li>
+  <li><code class="language-plaintext highlighter-rouge">selector</code>字段定义Deployment如何快速查找要管理的Pods。</li>
+  <li><code class="language-plaintext highlighter-rouge">template</code>p字段包含以下字段
+    <ol>
+      <li>Pod被使用<code class="language-plaintext highlighter-rouge">labels</code>字段打上<code class="language-plaintext highlighter-rouge">run: my-nginx</code></li>
+      <li>Pod模板规约（即<code class="language-plaintext highlighter-rouge">template.spec</code>字段）指示Pods运行一个<code class="language-plaintext highlighter-rouge">nginx</code>容器。该容器运行最新版本的<code class="language-plaintext highlighter-rouge">nginx</code>Docker Hub镜像。</li>
+      <li>创建一个容器并使用<code class="language-plaintext highlighter-rouge">name</code>字段将其命名为<code class="language-plaintext highlighter-rouge">my-nginx</code>。</li>
+    </ol>
+  </li>
+</ol>
+
+<p>二、使用kubectl工具创建pods</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl create <span class="nt">-f</span> my-nginx-rc.yaml
+</code></pre></div></div>
+
+<p>三、使用kubectl工具将pods暴露出来</p>
+
+<pre><code class="language-sh ">kubectl expose deployment/my-nginx --type=NodePort
+</code></pre>
+
+<p>四、查看Service的url</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>minikube service my-nginx --url
+# http://192.168.49.2:32328
+</code></pre></div></div>
+
+<p>五、访问nginx</p>
+
+<pre><code class="language-shell ">curl http://192.168.49.2:32328
+</code></pre>
+
+<p>输出结果为：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+&lt;title&gt;Welcome to nginx!&lt;/title&gt;
+&lt;style&gt;
+    body {
+        width: 35em;
+        margin: 0 auto;
+        font-family: Tahoma, Verdana, Arial, sans-serif;
+    }
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;h1&gt;Welcome to nginx!&lt;/h1&gt;
+&lt;p&gt;If you see this page, the nginx web server is successfully installed and
+working. Further configuration is required.&lt;/p&gt;
+
+&lt;p&gt;For online documentation and support please refer to
+&lt;a href="http://nginx.org/"&gt;nginx.org&lt;/a&gt;.&lt;br/&gt;
+Commercial support is available at
+&lt;a href="http://nginx.com/"&gt;nginx.com&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;Thank you for using nginx.&lt;/em&gt;&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre></div></div>
+
+<p>从上面的输出可以看出nginx已经正常工作了。</p>
+
+<h3 id="其它命令">其它命令</h3>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code># 删除一个一组pods
+kubectl delete -f my-nginx-rc.yaml
+# 查看pods,deployments,services
+kubectl get pods,deployments,services
+# 查看service的详细信息
+kubectl describe service/my-nginx
+# 进入一个容器
+kubectl exec my-nginx-5b56ccd65f-p6mmf -i -t bash 
+</code></pre></div></div>
+
+<p>参考链接</p>
+
+<ol>
+  <li>https://kubernetes.io/zh/docs/concepts/workloads/controllers/deployment/</li>
+</ol>
+
+
+  </div><a class="u-url" href="/devops/2020/10/27/k8s-tutorial.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Andrew&#39;s Blog</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Andrew&#39;s Blog</li><li><a class="u-email" href="mailto:zzcv20051122@126.com">zzcv20051122@126.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/yyandrew"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">yyandrew</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>A Rubyist&#39;s Blog.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

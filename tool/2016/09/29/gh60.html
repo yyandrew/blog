@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>GH60相关 | Andrew’s Blog</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="GH60相关" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="##组装" />
+<meta property="og:description" content="##组装" />
+<link rel="canonical" href="https://blog.ky2020.store/tool/2016/09/29/gh60.html" />
+<meta property="og:url" content="https://blog.ky2020.store/tool/2016/09/29/gh60.html" />
+<meta property="og:site_name" content="Andrew’s Blog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2016-09-29T08:53:48+00:00" />
+<script type="application/ld+json">
+{"description":"##组装","headline":"GH60相关","dateModified":"2016-09-29T08:53:48+00:00","url":"https://blog.ky2020.store/tool/2016/09/29/gh60.html","datePublished":"2016-09-29T08:53:48+00:00","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://blog.ky2020.store/tool/2016/09/29/gh60.html"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://blog.ky2020.store/feed.xml" title="Andrew's Blog" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Andrew&#39;s Blog</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about.html">关于我</a><a class="page-link" href="/projects.html">项目列表</a><a class="page-link" href="/toolbox.html">工具箱</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">GH60相关</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2016-09-29T08:53:48+00:00" itemprop="datePublished">Sep 29, 2016
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p>##组装</p>
+
+<p>'’焊接时应该遵循先低后高原则’’</p>
+
+<ol>
+  <li>焊接芯片，将芯片圆圈口对着线路板上的圆圈标志，焊接。</li>
+  <li>焊接USB接口，先焊接周围的固定焊盘，再焊接引脚</li>
+  <li>焊接晶振（仅限B版，L版应该先做第4步）</li>
+  <li>焊接周围器件 C1-C8、R1-R3、R5、K1</li>
+  <li>焊接晶振（仅限L版，L版应该先做第3步）</li>
+</ol>
+
+<p>然后插上电脑进行测试。
+如果能够成功识别到键盘，接下来是刷固件，参见[[GH60相关#刷固件]]。
+如果无法成功识别到键盘，参见[[GH60相关#常见问题]]。</p>
+
+<p>固件刷完后，焊接所有的二极管，注意方向。二极管箭头应该和线路板上的标志一致。</p>
+
+<p>插上电脑进行测试，使用<a href="https://www.baidu.com/s?wd=keyboardtestutility&amp;ie=UTF-8|">keyboardtestutility</a>进行测试。用镊子短路两个轴之间的点，观察是否所有按键都有反应。
+如果全部正常，进行下一步
+如果不正常，参见[[GH60相关#常见问题]]。</p>
+
+<p>'’L版如果要使用内置灯控务必先短路正面的J2-J4！’’</p>
+
+<p>接下来是装轴，注意要先装定位板再装轴。</p>
+
+<p>装好轴之后测试，全部正常就可以加灯了。</p>
+
+<p>L版焊接上剩下的电阻，短路J1和J6，焊接上Q1和R65；
+B版焊接上灯阻；
+插上电脑，按Fn+V打开灯；
+将发光二极管装上，观察是否能亮；
+如果可以就可以焊接了。</p>
+
+<h2 id="刷固件">刷固件</h2>
+<p>首先下载<a href="https://github.com/kairyu/tkg-toolkit/archive/master.zip">tkg-toolkit</a>解压到你喜欢的地方。
+插上键盘，打开<code class="language-plaintext highlighter-rouge">tkg-toolkit\windows\setup.bat</code>,依次选择<code class="language-plaintext highlighter-rouge">1(GH60 RevA/B/C) 然后回车</code>/<code class="language-plaintext highlighter-rouge">n 然后回车</code>/<code class="language-plaintext highlighter-rouge">1 回车</code>/<code class="language-plaintext highlighter-rouge">1 回车</code>,按任意键保存退出。
+接着打开<code class="language-plaintext highlighter-rouge">tkg-toolkit\windows\reflash.bat</code>，输入<code class="language-plaintext highlighter-rouge">y</code>后，按下键盘背面的RESET键。这时候就开始刷新固件了。
+如果固件刷新不成功，参见[[GH60相关#常见问题]]。</p>
+
+<h2 id="常见问题">常见问题</h2>
+
+<p>请跟随下列指示进行选择。</p>
+
+<ol>
+  <li>键盘插到电脑上是否正常识别？ 是-&gt;2/否-&gt;3</li>
+  <li>是否已经刷好固件？ 是-&gt;4/否-&gt;5</li>
+  <li>电脑有什么提示？ 无法识别的USB设备-&gt;6 一个USB设备超过其集线器端口的电源限制-&gt;7 什么反应都没有-&gt;8</li>
+  <li>键盘哪里有问题？ 按键-&gt;9 灯光-&gt;10</li>
+  <li>固件刷新中遇到问题了吗？ 按下RESET后没有反应-&gt;13 我还没刷固件-&gt;14</li>
+  <li>检查USB口是否焊接到位；检查主控周围原件是否焊接错误；换个USB口或数据线试试。</li>
+  <li>检查USB口是否引脚粘连；检查主控是否引脚粘连；检查原件是否引脚粘连。</li>
+  <li>检查USB口和原件是否焊接到位；检查晶振是否被焊坏了；检查芯片是否焊接方向错误。</li>
+  <li>键盘的问题是： 一个或多个按键无法识别-&gt;11 两个或多个按键同时按下-&gt;12</li>
+  <li>灯光的问题是： 全部灯不亮-&gt;15 某个灯不亮-&gt;16 开启灯光键盘就不工作-&gt;17</li>
+  <li>按键： 单个无法识别-&gt;18 一排无法识别-&gt;19</li>
+  <li>按键： 单两个同时按下-&gt;18 两排中的某两个键都同时按下-&gt;19</li>
+  <li>打开<code class="language-plaintext highlighter-rouge">tkg-toolkit\windows\tool\zadig-2.1.2.exe</code>,选上<code class="language-plaintext highlighter-rouge">Options-List All Device</code>，按下RESET键后，将Atm32U4DFU的驱动更换为libusbk或者其他的驱动，然后再次尝试刷新；或者换一台电脑试试。</li>
+  <li>快去刷固件</li>
+  <li>检查灯阻是否安装到位；是否按Fn+V打开了灯光；L版是否短路了J1-J4和J6，是否安装了R65和Q1。建议可以先装CapsLock灯测试，默认设置下，Fn+V打开灯光的同时也会打开这个灯。</li>
+  <li>检查灯阻是否安装到位；二极管是否装反；二极管是否烧坏。</li>
+  <li>检查二极管是否短路。</li>
+  <li>这不科学！不可能！你一定是搞错了！</li>
+  <li>检查主控引脚是否粘连</li>
+</ol>
+
+  </div><a class="u-url" href="/tool/2016/09/29/gh60.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Andrew&#39;s Blog</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Andrew&#39;s Blog</li><li><a class="u-email" href="mailto:zzcv20051122@126.com">zzcv20051122@126.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/yyandrew"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">yyandrew</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>A Rubyist&#39;s Blog.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

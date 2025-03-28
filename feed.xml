@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.1.1">Jekyll</generator><link href="https://blog.ky2020.store/feed.xml" rel="self" type="application/atom+xml" /><link href="https://blog.ky2020.store/" rel="alternate" type="text/html" /><updated>2025-03-28T07:31:40+00:00</updated><id>https://blog.ky2020.store/feed.xml</id><title type="html">Andrew’s Blog</title><subtitle>A Rubyist's Blog.</subtitle><entry><title type="html">使用 redis 的 bitmap 来只输出一次日志</title><link href="https://blog.ky2020.store/2025/03/28/use-bitmap-of-redis-in-rails-to-limit-count-of-logs.html" rel="alternate" type="text/html" title="使用 redis 的 bitmap 来只输出一次日志" /><published>2025-03-28T05:27:00+00:00</published><updated>2025-03-28T05:27:00+00:00</updated><id>https://blog.ky2020.store/2025/03/28/use-bitmap-of-redis-in-rails-to-limit-count-of-logs</id><content type="html" xml:base="https://blog.ky2020.store/2025/03/28/use-bitmap-of-redis-in-rails-to-limit-count-of-logs.html">&lt;h3 id=&quot;功能&quot;&gt;功能&lt;/h3&gt;
+&lt;p&gt;在 Rails 项目中使用 redis 的 bitmap 来只输出一次日志。&lt;/p&gt;
+
+&lt;h3 id=&quot;应用场景&quot;&gt;应用场景&lt;/h3&gt;
+&lt;p&gt;我们项目需要实现一个监控功能，如果优惠券状态异常需要打印一次日志。&lt;/p&gt;
+&lt;h3 id=&quot;实现逻辑&quot;&gt;实现逻辑&lt;/h3&gt;
+&lt;ol&gt;
+  &lt;li&gt;如果优惠券状态异常，redis 的 bitmap 中设置一个值。并且打印日志。&lt;/li&gt;
+  &lt;li&gt;如果优惠券状态正常，需要将 redis 的 bitmap 中的值清除。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h4 id=&quot;异常情况的代码&quot;&gt;异常情况的代码&lt;/h4&gt;
+&lt;div class=&quot;language-ruby highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!&lt;/span&gt;&lt;span class=&quot;vi&quot;&gt;@coupon&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;is_valid?&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;vg&quot;&gt;$redis&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;getbit&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;coupon_error&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;vi&quot;&gt;@coupon&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;id&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;to_i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;postive?&lt;/span&gt;
+
+    &lt;span class=&quot;vg&quot;&gt;$redis&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;setbit&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;coupon_error&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;vi&quot;&gt;@coupon&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;id&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;no&quot;&gt;Rails&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;logger&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;warn&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;优惠券 &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;#{&lt;/span&gt;&lt;span class=&quot;vi&quot;&gt;@coupon&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;id&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt; - &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;#{&lt;/span&gt;&lt;span class=&quot;vi&quot;&gt;@coupon&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;title&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt; 异常!&quot;&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h4 id=&quot;优惠券状态正常后的代码&quot;&gt;优惠券状态正常后的代码&lt;/h4&gt;
+&lt;div class=&quot;language-ruby highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;vi&quot;&gt;@coupon&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;is_valid?&lt;/span&gt;
+    &lt;span class=&quot;vg&quot;&gt;$redis&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;setbit&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;coupon_error&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;vi&quot;&gt;@coupon&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;id&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;</content><author><name></name></author><summary type="html">功能 在 Rails 项目中使用 redis 的 bitmap 来只输出一次日志。</summary></entry><entry><title type="html">使用redis实现一个简单的防抖功能</title><link href="https://blog.ky2020.store/2023/10/12/sample-lock-of-redis-in-rails.html" rel="alternate" type="text/html" title="使用redis实现一个简单的防抖功能" /><published>2023-10-12T03:08:00+00:00</published><updated>2023-10-12T03:08:00+00:00</updated><id>https://blog.ky2020.store/2023/10/12/sample-lock-of-redis-in-rails</id><content type="html" xml:base="https://blog.ky2020.store/2023/10/12/sample-lock-of-redis-in-rails.html">&lt;p&gt;使用 Redis 的 nx 属性可以限制执行频率。&lt;/p&gt;
+
+&lt;p&gt;下面的代码实现了 6 秒只执行一次查找用户的逻辑。&lt;/p&gt;
+
+&lt;div class=&quot;language-ruby highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;lock&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;email&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'foo@bar'&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;key&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;lock/&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;#{&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;email&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;vg&quot;&gt;$redis&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;set&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;key&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;nx: &lt;/span&gt;&lt;span class=&quot;kp&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;ex: &lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;6&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;seconds&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;user&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;User&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;find_by&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;email: &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;email&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;user&lt;/span&gt;
+
+    &lt;span class=&quot;no&quot;&gt;User&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;create!&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;email: &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;email&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;</content><author><name></name></author><summary type="html">使用 Redis 的 nx 属性可以限制执行频率。</summary></entry><entry><title type="html">解决git里推送新分支时出现的烦人 “fatal: The current branch test has no upstream branch”提示</title><link href="https://blog.ky2020.store/2023/08/09/solve-fatal-the-current-branch-test-has-no-upstream-branch-when-push-new-branch-to-remote.html" rel="alternate" type="text/html" title="解决git里推送新分支时出现的烦人 “fatal: The current branch test has no upstream branch”提示" /><published>2023-08-09T01:49:00+00:00</published><updated>2023-08-09T01:49:00+00:00</updated><id>https://blog.ky2020.store/2023/08/09/solve-fatal-the-current-branch-test-has-no-upstream-branch-when-push-new-branch-to-remote</id><content type="html" xml:base="https://blog.ky2020.store/2023/08/09/solve-fatal-the-current-branch-test-has-no-upstream-branch-when-push-new-branch-to-remote.html">&lt;h3 id=&quot;问题描述&quot;&gt;问题描述&lt;/h3&gt;
+&lt;p&gt;你如果在推送一个新的分支时出现下面提示的话就可以使用本文里的方法解决它。&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;fatal: The current branch test has no upstream branch.
+To push the current branch and set the remote as upstream, use
+
+    git push --set-upstream origin test
+
+To have this happen automatically for branches without a tracking
+upstream, see 'push.autoSetupRemote' in 'git help config'.
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;h3 id=&quot;解决方法&quot;&gt;解决方法&lt;/h3&gt;
+&lt;p&gt;将下面内容添加到 git 全局配置文件&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;~/.gitconfig&lt;/code&gt;，可以运行&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;git config --global --edit&lt;/code&gt;命令在系统默认编辑器里打开它。&lt;/p&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;[push]
+	autoSetupRemote = true
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;再重新推送分支，是不是没有提示并且成功推送分支了。&lt;/p&gt;</content><author><name></name></author><summary type="html">问题描述 你如果在推送一个新的分支时出现下面提示的话就可以使用本文里的方法解决它。</summary></entry><entry><title type="html">提升solargraph里的rails方法的智能提示</title><link href="https://blog.ky2020.store/2023/08/07/enhance-rails-intellisense-in-solargraph.html" rel="alternate" type="text/html" title="提升solargraph里的rails方法的智能提示" /><published>2023-08-07T06:18:00+00:00</published><updated>2023-08-07T06:18:00+00:00</updated><id>https://blog.ky2020.store/2023/08/07/enhance-rails-intellisense-in-solargraph</id><content type="html" xml:base="https://blog.ky2020.store/2023/08/07/enhance-rails-intellisense-in-solargraph.html">&lt;h3 id=&quot;环境&quot;&gt;环境&lt;/h3&gt;
+&lt;ol&gt;
+  &lt;li&gt;编辑器 Neovim&lt;/li&gt;
+  &lt;li&gt;Neovim 的 ruby lsp 客户端&lt;/li&gt;
+  &lt;li&gt;solargraph v0.44.0&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h3 id=&quot;配置安装-neovim-的-ruby-lsp客户端&quot;&gt;配置安装 Neovim 的 ruby lsp客户端&lt;/h3&gt;
+&lt;p&gt;按照&lt;a href=&quot;https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md#solargraph&quot;&gt;官方文档&lt;/a&gt;进行安装&lt;/p&gt;
+&lt;h3 id=&quot;安装-solargraph-gem&quot;&gt;安装 solargraph gem&lt;/h3&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;gem install solargraph -v 0.44.0
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;h3 id=&quot;生成-ruby-的官方-api-的文档&quot;&gt;生成 ruby 的官方 api 的文档&lt;/h3&gt;
+&lt;p&gt;进入到 Rails 的项目，运行下面的命令&lt;/p&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;solargraph download-core
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;此时编辑器会提示 ruby 的内置方法的文档&lt;/p&gt;
+&lt;h3 id=&quot;生成-rails-文档&quot;&gt;生成 Rails 文档&lt;/h3&gt;
+&lt;p&gt;运行下面命令为当前 Rails 项目的各个插件生成文档&lt;/p&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;bundle add yard # 将 yard 插件添加项目的 Gemfile 文件
+bundle exec yard gems
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;h3 id=&quot;添加配置文件使用-neovim-提示文档&quot;&gt;添加配置文件使用 Neovim 提示文档&lt;/h3&gt;
+&lt;p&gt;将 &lt;a href=&quot;https://gist.github.com/castwide/28b349566a223dfb439a337aea29713e&quot;&gt;https://gist.github.com/castwide/28b349566a223dfb439a337aea29713e&lt;/a&gt; 保存到 Rails 项目的 rails.rb 文件中&lt;/p&gt;
+
+&lt;h3 id=&quot;如果还没有提示&quot;&gt;如果还没有提示&lt;/h3&gt;
+&lt;p&gt;可以尝试下面命令&lt;/p&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;solargraph clear # 清除之前的文档
+bundle exec yard gems --rebuild # 重新生成文档
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;参考链接&lt;/p&gt;
+&lt;ol&gt;
+  &lt;li&gt;https://github.com/castwide/solargraph/issues/87&lt;/li&gt;
+&lt;/ol&gt;</content><author><name></name></author><summary type="html">环境 编辑器 Neovim Neovim 的 ruby lsp 客户端 solargraph v0.44.0</summary></entry><entry><title type="html">Mysql2 Error Specified key was too long; max key length is 767 bytes 问题修复</title><link href="https://blog.ky2020.store/2023/04/06/mysql2-error-specified-key-was-too-long-max-key-length-is-767-bytes.html" rel="alternate" type="text/html" title="Mysql2 Error Specified key was too long; max key length is 767 bytes 问题修复" /><published>2023-04-06T09:07:00+00:00</published><updated>2023-04-06T09:07:00+00:00</updated><id>https://blog.ky2020.store/2023/04/06/mysql2-error-specified-key-was-too-long-max-key-length-is-767-bytes</id><content type="html" xml:base="https://blog.ky2020.store/2023/04/06/mysql2-error-specified-key-was-too-long-max-key-length-is-767-bytes.html">&lt;p&gt;今天在尝试搭建 Rails 项目的测试环境时遇见了一个 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Mysql2::Error: Specified key was too long; max key length is 767 bytes&lt;/code&gt; 问题，&lt;/p&gt;
+
+&lt;p&gt;经过网上搜索发现是 MySql 会对表的字段名长度做限制，出现这个错误的原因是字段太长了，解决方法也很简单。有两种方法:&lt;/p&gt;
+&lt;ol&gt;
+  &lt;li&gt;修改 Rails 项目的 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;config/database.yml&lt;/code&gt; 里的 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;encoding: utf8&lt;/code&gt; 设置
+    &lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Unstaged &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;1&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+M config/database.yml
+@@ &lt;span class=&quot;nt&quot;&gt;-1&lt;/span&gt;,6 +1,6 @@
+ default: &amp;amp;default
+adapter: mysql2
+-  encoding: utf8mb4
++  encoding: utf8
+pool: 18
+@@ &lt;span class=&quot;nt&quot;&gt;-13&lt;/span&gt;,6 +13,7 @@ development:
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
+  &lt;/li&gt;
+  &lt;li&gt;使用下面 SQL 语句创建一个数据库
+    &lt;pre&gt;&lt;code class=&quot;language-SQL&quot;&gt;DROP DATABASE IF EXISTS &amp;lt;YOUR_DATABASE_NAME&amp;gt;;
+CREATE DATABASE &amp;lt;YOUR_DATABAE_NAME&amp;gt; DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
+&lt;/code&gt;&lt;/pre&gt;
+  &lt;/li&gt;
+&lt;/ol&gt;</content><author><name></name></author><summary type="html">今天在尝试搭建 Rails 项目的测试环境时遇见了一个 Mysql2::Error: Specified key was too long; max key length is 767 bytes 问题，</summary></entry><entry><title type="html">Rails 捕获自定义的异常</title><link href="https://blog.ky2020.store/2023/02/27/rescue-from-custom-error-in-rails.html" rel="alternate" type="text/html" title="Rails 捕获自定义的异常" /><published>2023-02-27T07:39:00+00:00</published><updated>2023-02-27T07:39:00+00:00</updated><id>https://blog.ky2020.store/2023/02/27/rescue-from-custom-error-in-rails</id><content type="html" xml:base="https://blog.ky2020.store/2023/02/27/rescue-from-custom-error-in-rails.html">&lt;p&gt;如果你的项目能够在一处代码捕获任意地方的异常是的话是不是一件非常酷的一件事件？
+下面就看看怎么在 Rails 项目中实现这种的功能。&lt;/p&gt;
+
+&lt;p&gt;需要使用的的 API：&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;https://apidock.com/ruby/Kernel/raise&quot;&gt;raise&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://apidock.com/rails/ActiveSupport/Rescuable/ClassMethods/rescue_from&quot;&gt;rescue_from&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;通过下面两步可以实现本文的全局捕获异常的功能：&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;在项目中新建一个文件&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;app/controllers/concerns/error_handlable.rb&lt;/code&gt;，内容如下
+```ruby
+module ErrorHandlable
+  extend ActiveSupport::Concern
+  # 自定义一个异常
+  class MyError &amp;lt; StandardError; end&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;included do
+    # rescue_from 是 Rails 提供的一个捕获异常的方法
+    rescue_from MyError do |e|
+      render_error e.message
+    end&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;def render_error(message)
+  render json: { status: 400, message: message}
+end   end end ```
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;在 controller 里的 action 添加下面的逻辑
+```ruby
+class FooController &amp;lt; ApplicationController
+  include ErrorHandlable&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;def index
+    @bar = Bar.find_by id: params[:id]&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;# 如果没有找到记录，就抛出异常
+raise MyError, 'Record not found' unless @bar
+
+respond_to do |format|
+  format.json { render json: { bar: @bar } }
+end   end end ```
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;访问&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;http://localhost:3000/foos&lt;/code&gt;就可以触发异常-&amp;gt;捕获异常-&amp;gt;渲染定制内容&lt;/p&gt;</content><author><name></name></author><summary type="html">如果你的项目能够在一处代码捕获任意地方的异常是的话是不是一件非常酷的一件事件？ 下面就看看怎么在 Rails 项目中实现这种的功能。</summary></entry><entry><title type="html">一次 X-CSRF-Token 引起的Rails 项目 session 为空的问题</title><link href="https://blog.ky2020.store/2023/02/22/session-will-be-empty-if-csrf-token-is-invalid-in-rails.html" rel="alternate" type="text/html" title="一次 X-CSRF-Token 引起的Rails 项目 session 为空的问题" /><published>2023-02-22T02:16:00+00:00</published><updated>2023-02-22T02:16:00+00:00</updated><id>https://blog.ky2020.store/2023/02/22/session-will-be-empty-if-csrf-token-is-invalid-in-rails</id><content type="html" xml:base="https://blog.ky2020.store/2023/02/22/session-will-be-empty-if-csrf-token-is-invalid-in-rails.html">&lt;h3 id=&quot;问题描述&quot;&gt;问题描述&lt;/h3&gt;
+&lt;p&gt;在页面上使用 ajax 发送异步请求无法验证用户。猜测是因为cookies非法导致的。&lt;/p&gt;
+
+&lt;h3 id=&quot;尝试解决过程&quot;&gt;尝试解决过程&lt;/h3&gt;
+&lt;ol&gt;
+  &lt;li&gt;通过浏览器的开发工具-&amp;gt;网络查看 Request Headers 发现 Cookie 是有一起随请求发送给服务端的，于是有了第二步；&lt;/li&gt;
+  &lt;li&gt;通过在 controller 使用 &lt;a href=&quot;https://apidock.com/rails/ActionController/Cookies/cookies&quot;&gt;cookies&lt;/a&gt; 方法打印当前用户的 cookies 发现用户的 cookies 为空，返回值为&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;ActionController::RequestForgeryProtection::ProtectionMethods::NullSession::NullCookieJar&lt;/code&gt;。&lt;a href=&quot;https://stackoverflow.com/a/36733432&quot;&gt; NullCookieJar 产生的原因&lt;/a&gt;是 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;verify_authenticity_token&lt;/code&gt; 方法验证 Cross-Site Request Forgery (CSRF) 失败造成的。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h3 id=&quot;解决方案&quot;&gt;解决方案&lt;/h3&gt;
+&lt;p&gt;有两种方案可以解决这个问题&lt;/p&gt;
+
+&lt;p&gt;方案一: 在相应的 controller 里添加 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;skip_before_action :verify_authenticity_token&lt;/code&gt; 跳过 CSRF 验证即可以解决问题。(本例使用的方案)。&lt;/p&gt;
+
+&lt;p&gt;方案二: 由服务端生成一个 X-CSRF-Token 并将其隐藏在页面上，在发送 ajax 请求时就这个 X-CSRF-Token 添加到请求头，随着请求一起发送到服务端。&lt;/p&gt;
+
+&lt;p&gt;参考链接：&lt;/p&gt;
+&lt;ol&gt;
+  &lt;li&gt;&lt;a href=&quot;https://stackoverflow.com/a/45919902&quot;&gt;Difference between request.cookies and cookies in a controller&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;</content><author><name></name></author><summary type="html">问题描述 在页面上使用 ajax 发送异步请求无法验证用户。猜测是因为cookies非法导致的。</summary></entry><entry><title type="html">嵌入到iframe里的应用用户验证问题解决方案</title><link href="https://blog.ky2020.store/2023/02/21/authentification-in-3rd-party-iframe.html" rel="alternate" type="text/html" title="嵌入到iframe里的应用用户验证问题解决方案" /><published>2023-02-21T04:52:00+00:00</published><updated>2023-02-21T04:52:00+00:00</updated><id>https://blog.ky2020.store/2023/02/21/authentification-in-3rd-party-iframe</id><content type="html" xml:base="https://blog.ky2020.store/2023/02/21/authentification-in-3rd-party-iframe.html">&lt;h3 id=&quot;问题描述&quot;&gt;问题描述&lt;/h3&gt;
+&lt;p&gt;最近有个新的需求要将现有的后台管理系统（子级系统）嵌入到 iframe 里(在父级系统)使用。在开发的过程中发现了 POST , PATCH , PUT 这类修改数据的请求无法正常使用，会强制跳转到登录页面，但是 GET 获取数据请求却不会跳转到登录页面。&lt;/p&gt;
+
+&lt;p&gt;经过搜索得知是因为安全原因 &lt;strong&gt;cookie 不能跨域名&lt;/strong&gt;导致 iframe 里触发的修改数据请求不会自动带上 cookie 随请求一起发送到后端。&lt;/p&gt;
+
+&lt;h3 id=&quot;解决方案&quot;&gt;解决方案&lt;/h3&gt;
+
+&lt;p&gt;一般有下面三种解决方案&lt;/p&gt;
+&lt;ol&gt;
+  &lt;li&gt;服务端设置 cookie 时，将其设置成 SameSite=None 并且要设置 Secure（本例采用的方法）；&lt;/li&gt;
+  &lt;li&gt;将 iframe 里的应用部署到同一个二级域名下（不适用本例）;&lt;/li&gt;
+  &lt;li&gt;使用 jwt 验证（工作量略大，时间上不允许）;&lt;/li&gt;
+  &lt;li&gt;设置代理（不适用本例）。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;这两个值的含义分别是：&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;SameSite=None: Cookie 将在所有上下文中发送，即允许跨站发送&lt;/li&gt;
+  &lt;li&gt;Secure: Cookie仅通过 HTTPS 协议加密发送到服务器。
+如果只设置 SameSite=None 但是没有设置 Secure 会出现警告，这类 cookie 会被拒绝。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Rails 项目的设置方法：修改&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;config/initializers/session_store.rb&lt;/code&gt;，内容如下：&lt;/p&gt;
+
+&lt;div class=&quot;language-ruby highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;no&quot;&gt;YourApplication&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Application&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;config&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;session_store&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;:cookie_store&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;key: &lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'_your_application_session'&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;参考链接：&lt;/p&gt;
+&lt;ol&gt;
+  &lt;li&gt;&lt;a href=&quot;https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Headers/Set-Cookie/SameSite&quot;&gt;https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Headers/Set-Cookie/SameSite&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;</content><author><name></name></author><summary type="html">问题描述 最近有个新的需求要将现有的后台管理系统（子级系统）嵌入到 iframe 里(在父级系统)使用。在开发的过程中发现了 POST , PATCH , PUT 这类修改数据的请求无法正常使用，会强制跳转到登录页面，但是 GET 获取数据请求却不会跳转到登录页面。</summary></entry><entry><title type="html">Vue里父组件的对象修改无法触发子组件的更新问题解决方案</title><link href="https://blog.ky2020.store/2023/02/15/object-props-can-t-trigger-refresh-of-child-component.html" rel="alternate" type="text/html" title="Vue里父组件的对象修改无法触发子组件的更新问题解决方案" /><published>2023-02-15T09:48:00+00:00</published><updated>2023-02-15T09:48:00+00:00</updated><id>https://blog.ky2020.store/2023/02/15/object-props-can-t-trigger-refresh-of-child-component</id><content type="html" xml:base="https://blog.ky2020.store/2023/02/15/object-props-can-t-trigger-refresh-of-child-component.html">&lt;h3 id=&quot;解决方案&quot;&gt;解决方案&lt;/h3&gt;
+&lt;p&gt;方案一：在声明&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;errors&lt;/code&gt;的时候将属性也一并声明好，比如&lt;/p&gt;
+&lt;div class=&quot;language-javascript highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nx&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;errors&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;foo&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;bar&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;方案二：使用&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Vue.set&lt;/code&gt;(它的别名为&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;vm.$set&lt;/code&gt;)在动态添加属性的同时将属性设置成响应式的。官方文档是这样描述&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Vue.set&lt;/code&gt;的&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;对于已经创建的实例，Vue 不允许动态添加根级别的响应式 property。但是，可以使用 Vue.set(object, propertyName, value) 方法向嵌套对象添加响应式 property
+于是有了下面的代码：
+``` javascript
+// 添加属性
+this.$set(this.errors, ‘foo’, ‘错误一’)
+this.$set(this.errors, ‘bar’, ‘错误一’)&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;// 删除对象属性
+// this.$delete(this.errors, ‘foo’)
+// this.$delete(this.errors, ‘bar’)
+```&lt;/p&gt;</content><author><name></name></author><summary type="html">解决方案 方案一：在声明errors的时候将属性也一并声明好，比如 data() { return { errors: { foo: null, bar: null, } } }</summary></entry><entry><title type="html">Group里的gem依赖包不能自动加载到$LOAD_PATHS的解决方案</title><link href="https://blog.ky2020.store/2023/02/08/gem-in-group-can-t-load-automatically.html" rel="alternate" type="text/html" title="Group里的gem依赖包不能自动加载到$LOAD_PATHS的解决方案" /><published>2023-02-08T01:16:00+00:00</published><updated>2023-02-08T01:16:00+00:00</updated><id>https://blog.ky2020.store/2023/02/08/gem-in-group-can-t-load-automatically</id><content type="html" xml:base="https://blog.ky2020.store/2023/02/08/gem-in-group-can-t-load-automatically.html">&lt;h3 id=&quot;问题&quot;&gt;问题&lt;/h3&gt;
+&lt;p&gt;运行&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;rails console&lt;/code&gt;时不能自动进入&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;pry&lt;/code&gt;环境，&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Gemfile&lt;/code&gt;文件里的&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;pry&lt;/code&gt;系列依赖包如下，放在&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;test&lt;/code&gt;及&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;development&lt;/code&gt;这两个组，表示只有在这两个环境下&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;pry&lt;/code&gt;才有效。&lt;/p&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;group :test, :development do
+  gem 'pry'
+  gem 'pry-doc'
+  gem 'pry-rails'
+  gem 'pry-byebug'
+end
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;排查过程&quot;&gt;排查过程&lt;/h3&gt;
+&lt;ol&gt;
+  &lt;li&gt;运行&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;rails console&lt;/code&gt;进入到&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;irb&lt;/code&gt;环境，使用&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;$LOAD_PATH.find {|path| path.match /pry/}&lt;/code&gt;看看&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;$LOAD_PATHS&lt;/code&gt;是否包含&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;pry&lt;/code&gt;，结果是&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;nil&lt;/code&gt;表示&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;pry&lt;/code&gt;没有自动加载;&lt;/li&gt;
+  &lt;li&gt;退出&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;rails console&lt;/code&gt;环境到shell，运行&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;bundle show pry&lt;/code&gt;，结果提示没有安装&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;pry&lt;/code&gt;, 可我明明把&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;pry&lt;/code&gt;加到了&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;development&lt;/code&gt;和&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;test&lt;/code&gt;组了啊；&lt;img src=&quot;/images/bundle-show-pry.png&quot; alt=&quot;bundle-show-pry.png&quot; /&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;ol start=&quot;3&quot;&gt;
+  &lt;li&gt;百思不得其解，只能上网搜结果了，最后找到&lt;a href=&quot;https://stackoverflow.com/a/26993819&quot;&gt;是因为项目目录下包含&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;.bundle/config&lt;/code&gt;的&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;BUNDLE_WITHOUT&lt;/code&gt;配置导致的&lt;/a&gt;，下面是我的项目的&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;.bundle/config&lt;/code&gt;内容&lt;img src=&quot;/images/content-of-bundle-config.png&quot; alt=&quot;content-of-bundle-config.png&quot; /&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h3 id=&quot;解决方法&quot;&gt;解决方法&lt;/h3&gt;
+&lt;p&gt;删除掉&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;.bundle/config&lt;/code&gt;文件里的&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;BUNDLE_WITHOUT: &quot;development:test&quot;&lt;/code&gt;这一行，重新运行&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;bundle&lt;/code&gt;，使用&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;rails console&lt;/code&gt;发现我们的好帮手&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;pry&lt;/code&gt;又回来了。&lt;/p&gt;
+
+&lt;p&gt;小提示：
+运行&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;bundle install --without development test&lt;/code&gt;命令时，&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;.config/bundle&lt;/code&gt;会自动产生，并将你的&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;without&lt;/code&gt;命令选项保存到这个文件&lt;/p&gt;</content><author><name></name></author><summary type="html">问题 运行rails console时不能自动进入pry环境，Gemfile文件里的pry系列依赖包如下，放在test及development这两个组，表示只有在这两个环境下pry才有效。 group :test, :development do gem 'pry' gem 'pry-doc' gem 'pry-rails' gem 'pry-byebug' end</summary></entry></feed>

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Rails自动加载运行机制之reload_classes_only_on_change | Andrew’s Blog</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="Rails自动加载运行机制之reload_classes_only_on_change" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="下面的源代码都是来自Rails 5.2.4.4。" />
+<meta property="og:description" content="下面的源代码都是来自Rails 5.2.4.4。" />
+<link rel="canonical" href="https://blog.ky2020.store/rails/2021/04/22/reload-mechanism-of-rails-2-reload-classes-only-on-change.html" />
+<meta property="og:url" content="https://blog.ky2020.store/rails/2021/04/22/reload-mechanism-of-rails-2-reload-classes-only-on-change.html" />
+<meta property="og:site_name" content="Andrew’s Blog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-04-22T04:52:00+00:00" />
+<script type="application/ld+json">
+{"description":"下面的源代码都是来自Rails 5.2.4.4。","headline":"Rails自动加载运行机制之reload_classes_only_on_change","dateModified":"2021-04-22T04:52:00+00:00","url":"https://blog.ky2020.store/rails/2021/04/22/reload-mechanism-of-rails-2-reload-classes-only-on-change.html","datePublished":"2021-04-22T04:52:00+00:00","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://blog.ky2020.store/rails/2021/04/22/reload-mechanism-of-rails-2-reload-classes-only-on-change.html"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://blog.ky2020.store/feed.xml" title="Andrew's Blog" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Andrew&#39;s Blog</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about.html">关于我</a><a class="page-link" href="/projects.html">项目列表</a><a class="page-link" href="/toolbox.html">工具箱</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Rails自动加载运行机制之reload_classes_only_on_change</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2021-04-22T04:52:00+00:00" itemprop="datePublished">Apr 22, 2021
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p>下面的源代码都是来自Rails 5.2.4.4。</p>
+
+<p>Rails是通过<code class="language-plaintext highlighter-rouge">cache_classes</code>和<code class="language-plaintext highlighter-rouge">reload_classes_only_on_change</code>配置(在development环境下默认是cache_classes为false，即开启自动加载；reload_classes_only_on_change为true)是否开启自动刷新代码功能。</p>
+
+<h3 id="reload_classes_only_on_change">reload_classes_only_on_change</h3>
+
+<p>从名字就可以猜到这个设置是告诉Rails代码更新操作只发生在有文件修改时。比如你修改了一个controller或者一个model，它们都会触发reload。</p>
+
+<p>你可以在<a href="https://github.com/rails/rails/blob/4dcc5435e9569e084f6f90fcea6e7c37d7bd2b4d/railties/lib/rails/application/finisher.rb#L149">这里</a>找到相关代码。</p>
+
+<p>下面是一个initializer，它会在你启动，初始化Rails应用时候运行。Rails应用通常可以通过<code class="language-plaintext highlighter-rouge">bin/rails server</code>或者<code class="language-plaintext highlighter-rouge">bin/rails console</code>命令启动。</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="n">initializer</span> <span class="ss">:set_clear_dependencies_hook</span><span class="p">,</span> <span class="ss">group: :all</span> <span class="k">do</span> <span class="o">|</span><span class="n">app</span><span class="o">|</span>
+    <span class="n">callback</span> <span class="o">=</span> <span class="nb">lambda</span> <span class="k">do</span>
+      <span class="no">ActiveSupport</span><span class="o">::</span><span class="no">DescendantsTracker</span><span class="p">.</span><span class="nf">clear</span>
+      <span class="no">ActiveSupport</span><span class="o">::</span><span class="no">Dependencies</span><span class="p">.</span><span class="nf">clear</span>
+    <span class="k">end</span>
+
+    <span class="k">if</span> <span class="n">config</span><span class="p">.</span><span class="nf">cache_classes</span>
+      <span class="n">app</span><span class="p">.</span><span class="nf">reloader</span><span class="p">.</span><span class="nf">check</span> <span class="o">=</span> <span class="nb">lambda</span> <span class="p">{</span> <span class="kp">false</span> <span class="p">}</span>
+    <span class="k">elsif</span> <span class="n">config</span><span class="p">.</span><span class="nf">reload_classes_only_on_change</span>
+      <span class="n">app</span><span class="p">.</span><span class="nf">reloader</span><span class="p">.</span><span class="nf">check</span> <span class="o">=</span> <span class="nb">lambda</span> <span class="k">do</span>
+        <span class="n">app</span><span class="p">.</span><span class="nf">reloaders</span><span class="p">.</span><span class="nf">map</span><span class="p">(</span><span class="o">&amp;</span><span class="ss">:updated?</span><span class="p">).</span><span class="nf">any?</span>
+      <span class="k">end</span>
+    <span class="k">else</span>
+      <span class="n">app</span><span class="p">.</span><span class="nf">reloader</span><span class="p">.</span><span class="nf">check</span> <span class="o">=</span> <span class="nb">lambda</span> <span class="p">{</span> <span class="kp">true</span> <span class="p">}</span>
+    <span class="k">end</span>
+
+    <span class="k">if</span> <span class="n">config</span><span class="p">.</span><span class="nf">reload_classes_only_on_change</span>
+      <span class="n">reloader</span> <span class="o">=</span> <span class="n">config</span><span class="p">.</span><span class="nf">file_watcher</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="o">*</span><span class="n">watchable_args</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">callback</span><span class="p">)</span>
+      <span class="n">reloaders</span> <span class="o">&lt;&lt;</span> <span class="n">reloader</span>
+
+      <span class="c1"># Prepend this callback to have autoloaded constants cleared before</span>
+      <span class="c1"># any other possible reloading, in case they need to autoload fresh</span>
+      <span class="c1"># constants.</span>
+      <span class="n">app</span><span class="p">.</span><span class="nf">reloader</span><span class="p">.</span><span class="nf">to_run</span><span class="p">(</span><span class="ss">prepend: </span><span class="kp">true</span><span class="p">)</span> <span class="k">do</span>
+        <span class="c1"># In addition to changes detected by the file watcher, if routes</span>
+        <span class="c1"># or i18n have been updated we also need to clear constants,</span>
+        <span class="c1"># that's why we run #execute rather than #execute_if_updated, this</span>
+        <span class="c1"># callback has to clear autoloaded constants after any update.</span>
+        <span class="n">class_unload!</span> <span class="k">do</span>
+          <span class="n">reloader</span><span class="p">.</span><span class="nf">execute</span>
+        <span class="k">end</span>
+      <span class="k">end</span>
+    <span class="k">else</span>
+      <span class="n">app</span><span class="p">.</span><span class="nf">reloader</span><span class="p">.</span><span class="nf">to_complete</span> <span class="k">do</span>
+        <span class="n">class_unload!</span><span class="p">(</span><span class="o">&amp;</span><span class="n">callback</span><span class="p">)</span>
+      <span class="k">end</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+</code></pre></div></div>
+
+<p>这个intializer会创建一个可调用的对象lambda，它们用于清除内存中已有的常量，下一篇会介绍这两个方法。我们先看看在ruby里<code class="language-plaintext highlighter-rouge">lambda</code>怎么使用。</p>
+
+<p>我们可以通过<code class="language-plaintext highlighter-rouge">lambda {}</code>创建一个可调用对象，将其保存在一个常量里，需要的时候使用<code class="language-plaintext highlighter-rouge">call</code>调用执行，可以达到延迟执行的效果。</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">callback</span> <span class="o">=</span> <span class="nb">lambda</span> <span class="p">{</span> <span class="nb">puts</span> <span class="s2">"I'm a lambda!"</span><span class="p">}</span>
+<span class="n">callback</span><span class="p">.</span><span class="nf">call</span> <span class="c1"># =&gt; I'm a lambda!</span>
+</code></pre></div></div>
+
+<p>我们还可以通过<code class="language-plaintext highlighter-rouge">&amp;</code>将lambda对象当作参数传给方法，在方法体调用<code class="language-plaintext highlighter-rouge">call</code>执行它。</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">callback</span> <span class="o">=</span> <span class="nb">lambda</span> <span class="p">{</span> <span class="nb">puts</span> <span class="s2">"I'm a lambda!"</span> <span class="p">}</span>
+
+<span class="k">def</span> <span class="nf">test</span><span class="p">(</span><span class="o">&amp;</span><span class="n">c</span><span class="p">)</span>
+  <span class="n">c</span><span class="p">.</span><span class="nf">call</span>
+<span class="k">end</span>
+
+<span class="nb">test</span><span class="p">(</span><span class="o">&amp;</span><span class="n">callback</span><span class="p">)</span> <span class="c1"># =&gt; I'm a lambda!</span>
+</code></pre></div></div>
+
+<p>这个initializer使用了&amp;传递lambda的方法。</p>
+
+<p>接下来文件监视器<code class="language-plaintext highlighter-rouge">file_watcher</code>被创建，用来监控<code class="language-plaintext highlighter-rouge">autoload_paths</code>包含的文件（参数<code class="language-plaintext highlighter-rouge">watchable_args</code>是由<code class="language-plaintext highlighter-rouge">autoload_paths</code>以及<code class="language-plaintext highlighter-rouge">schema.rb</code>、<code class="language-plaintext highlighter-rouge">structure.sql</code>等文件组成的)。</p>
+
+<p>在传递参数时。<code class="language-plaintext highlighter-rouge">*</code>操作符可以将参数列表转换成数组。</p>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">m</span><span class="p">(</span><span class="o">*</span><span class="n">a</span><span class="p">)</span>
+  <span class="nb">puts</span> <span class="n">a</span><span class="p">.</span><span class="nf">is_a?</span><span class="p">(</span><span class="no">Array</span><span class="p">)</span> <span class="c1"># =&gt; true</span>
+<span class="k">end</span>
+<span class="n">m</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>如果<code class="language-plaintext highlighter-rouge">reload_classes_only_on_change</code>为true时使用file_watcher(Development环境使用<code class="language-plaintext highlighter-rouge">ActiveSupport::EventedFileUpdateChecker</code>)来监控文件是否有变化，如果有变化<code class="language-plaintext highlighter-rouge">ActiveSupport::EventedFileUpdateChecker#execute</code>会调用<code class="language-plaintext highlighter-rouge">callback</code>这个lambda来清空所有的常量(constant)；</p>
+
+<p>如果<code class="language-plaintext highlighter-rouge">reload_classes_only_on_change</code>为false则通过<code class="language-plaintext highlighter-rouge">to_complete</code>钩子在每次请求之后调用<code class="language-plaintext highlighter-rouge">callback</code> 这个lambda来清空所有的常量(constant)。</p>
+
+<p>总结：</p>
+
+<ol>
+  <li><code class="language-plaintext highlighter-rouge">initializer</code>在每次启动Rails应用时运行；</li>
+  <li>使用<code class="language-plaintext highlighter-rouge">&amp;</code>操作符可以将lambda传递给方法；</li>
+  <li><code class="language-plaintext highlighter-rouge">*</code>操作符可以将方法的参数列表转换成数组；</li>
+  <li>使用<code class="language-plaintext highlighter-rouge">ActiveSupport::EventedFileUpdateChecker</code>可以监控文件的变化</li>
+</ol>
+
+  </div><a class="u-url" href="/rails/2021/04/22/reload-mechanism-of-rails-2-reload-classes-only-on-change.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Andrew&#39;s Blog</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Andrew&#39;s Blog</li><li><a class="u-email" href="mailto:zzcv20051122@126.com">zzcv20051122@126.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/yyandrew"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">yyandrew</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>A Rubyist&#39;s Blog.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
